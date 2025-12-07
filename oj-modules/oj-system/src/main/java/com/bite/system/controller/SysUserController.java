@@ -1,5 +1,6 @@
 package com.bite.system.controller;
 
+import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
 import com.bite.system.domain.LoginDTO;
 import com.bite.system.domain.SysUserSaveDTO;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sysUser")
 @Tag(name = "管理员接口") //分组，类上
-public class SysUserController {
+public class SysUserController extends BaseController {
 
     @Autowired
     private ISysUserService sysUserService;
@@ -43,7 +44,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000",description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101",description = "用户已存在")
     public R<Void> add(@RequestBody SysUserSaveDTO sysUserSaveDTO){
-        return null;
+        return toR(sysUserService.add(sysUserSaveDTO));
     }
 
     @DeleteMapping("/{userId}")

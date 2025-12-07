@@ -2,6 +2,7 @@ package com.bite.common.security.handler;
 
 import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
+import com.bite.common.security.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -22,6 +23,18 @@ public class GlobalExceptionHandler
         String requestURI = request.getRequestURI();
  log.error("请求地址'{}',不⽀持'{}'请求", requestURI, e.getMethod());
         return R.fail(ResultCode.ERROR);
+    }
+
+
+    /**
+     * 拦截运⾏时异常
+     */
+    @ExceptionHandler(ServiceException.class)
+    public R<?> handleServiceException(ServiceException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        ResultCode resultCode = e.getResultCode();
+        log.error("请求地址'{}',发⽣业务异常:{}", requestURI, resultCode.getMsg(),e);
+        return R.fail(resultCode);
     }
 
 

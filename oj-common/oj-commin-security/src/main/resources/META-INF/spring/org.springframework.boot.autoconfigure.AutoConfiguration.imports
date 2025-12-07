@@ -1,2 +1,4 @@
 com.bite.common.security.handler.GlobalExceptionHandler
 com.bite.common.security.service.TokenService
+com.bite.common.security.config.WebMvcConfig
+com.bite.common.security.interceptor.TokenInterceptor

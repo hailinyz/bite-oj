@@ -49,6 +49,14 @@ public class RedisService {
         return redisTemplate.expire(key, timeout, unit);
     }
 
+    /*
+    * 获取剩余有效时间，单位秒
+     */
+    public long getExpire(final String key,final TimeUnit  unit) {
+        return redisTemplate.getExpire(key,unit);
+    }
+
+
     /**
      * 删除单个对象
      *
