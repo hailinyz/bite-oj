@@ -8,7 +8,7 @@ import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.common.security.service.TokenService;
 import com.bite.system.domain.SysUser;
-import com.bite.system.domain.SysUserSaveDTO;
+import com.bite.system.domain.dto.SysUserSaveDTO;
 import com.bite.system.mapper.SysUserMapper;
 import com.bite.system.service.ISysUserService;
 import com.bite.system.utils.BCryptUtils;
@@ -68,6 +68,9 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public int add(SysUserSaveDTO sysUserSaveDTO) {
+
+//        checkParams(sysUserSaveDTO);
+
         //将DTO对象转换成实体对象
         List<SysUser> sysUserList = sysUserMapper.selectList(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUserAccount, sysUserSaveDTO.getUserAccount()));
@@ -80,8 +83,13 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setUserAccount(sysUserSaveDTO.getUserAccount());
         sysUser.setPassword(BCryptUtils.encryptPassword(sysUserSaveDTO.getPassword()));
         return sysUserMapper.insert(sysUser);
-
     }
+
+/*    private void checkParams(SysUserSaveDTO sysUserSaveDTO){
+        if (sysUserSaveDTO == null){
+            throw new ServiceException();
+        }
+    }*/
 
 
 }

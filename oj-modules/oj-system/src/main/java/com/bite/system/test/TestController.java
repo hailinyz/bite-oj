@@ -4,9 +4,11 @@ import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.redis.service.RedisService;
 import com.bite.system.domain.SysUser;
+import com.bite.system.test.domain.ValidationDTO;
 import com.bite.system.test.service.ITestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,5 +64,10 @@ public class TestController {
         log.info("我是info级日志");
         log.error("我是error级日志");
         return "日志测试";
+    }
+
+    @GetMapping("/validation")
+    public String validation(@Validated ValidationDTO validationDTO){
+        return "参数测试";
     }
 }

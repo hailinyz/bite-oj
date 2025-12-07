@@ -1,4 +1,4 @@
-package com.bite.system.domain;
+package com.bite.system.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;

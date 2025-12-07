@@ -2,9 +2,9 @@ package com.bite.system.controller;
 
 import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
-import com.bite.system.domain.LoginDTO;
-import com.bite.system.domain.SysUserSaveDTO;
-import com.bite.system.domain.SysUserVO;
+import com.bite.system.domain.dto.LoginDTO;
+import com.bite.system.domain.dto.SysUserSaveDTO;
+import com.bite.system.domain.vo.SysUserVO;
 import com.bite.system.service.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
