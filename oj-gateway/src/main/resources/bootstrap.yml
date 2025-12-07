@@ -1,7 +1,7 @@
 spring:
   application:
     # 应⽤名称
-    name: oj-system
+    name: oj-gateway
   profiles:
     active: local
   cloud:

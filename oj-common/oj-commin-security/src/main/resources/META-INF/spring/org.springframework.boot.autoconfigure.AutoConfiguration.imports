@@ -1,1 +1,2 @@
-com.bite.common.security.GlobalExceptionHandler
+com.bite.common.security.handler.GlobalExceptionHandler
+com.bite.common.security.service.TokenService
