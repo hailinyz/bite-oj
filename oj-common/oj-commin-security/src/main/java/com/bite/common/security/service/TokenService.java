@@ -23,7 +23,7 @@ public class TokenService {
     private RedisService redisService;
 
 
-    public String createToken(Long userId, String secret,Integer identity){
+    public String createToken(Long userId, String secret,Integer identity,String nickName){
 
         Map<String, Object> claims = new HashMap<>();
         String userKey = UUID.fastUUID().toString();
@@ -40,6 +40,7 @@ public class TokenService {
         String tokenkey = getTokenKey(userKey);
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity);
+        loginUser.setNickName(nickName);
         redisService.setCacheObject(tokenkey, loginUser,CacheConstants.EXP, TimeUnit.MINUTES);
 
         return token;
@@ -52,7 +53,7 @@ public class TokenService {
     操作reids，拿到token中的userKey（唯一标识）
      */
     public void extendToken(String  token,String secret) { //在拦截器中判断token是否过期，过期就延长有效期
-        Claims claims;
+/*        Claims claims;
         try {
             claims = JwtUtils.parseToken(token, secret); //获取令牌中信息 解析payload中信息
             if (claims == null) {
@@ -63,7 +64,11 @@ public class TokenService {
             log.error("解析token：{}，出现异常",token,e);
             return;
         }
-        String userKey = JwtUtils.getUserKey(claims); //获取jwt中的key
+        String userKey = JwtUtils.getUserKey(claims); //获取jwt中的key*/
+        String userKey = getUserKey(token,secret);
+        if (userKey == null) {
+            return;
+        }
         String tokenkey = getTokenKey(userKey);
 
         //720min 12h 剩余180min进行延长
@@ -78,6 +83,46 @@ public class TokenService {
     private String getTokenKey(String token) {
         return CacheConstants.LOGIN_TOKEN_KET + token;
     }
+
+    private String getUserKey(String  token,String secret) {
+        Claims claims;
+        try {
+            claims = JwtUtils.parseToken(token, secret); //获取令牌中信息 解析payload中信息
+            if (claims == null) {
+                log.error("解析token：{}，出现异常",token);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("解析token：{}，出现异常",token,e);
+            return null;
+        }
+        return JwtUtils.getUserKey(claims); //获取jwt中的key
+    }
+
+    /*
+    获取登录用户信息
+     */
+    public LoginUser getLoginUser(String token,String secret) {
+        String userKey = getUserKey(token, secret);
+        if (userKey == null){
+            return null;
+        }
+        return redisService.getCacheObject(getTokenKey(userKey),LoginUser.class);
+    }
+
+
+    /*
+    删除登录用户信息
+     */
+    public boolean deleteLoginUser(String token, String secret) {
+        String userKey = getUserKey(token, secret);
+        if (userKey == null){
+            return false;
+        }
+        return redisService.deleteObject(getTokenKey(userKey));
+    }
+
+
 
 
 }

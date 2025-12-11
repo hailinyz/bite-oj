@@ -67,6 +67,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
         } catch (Exception e) {
             return unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
+
+        //通过redis中存储的数据，来判断用户是否登录
         String userKey = JwtUtils.getUserKey(claims); //获取jwt中的key
         boolean isLogin = redisService.hasKey(getTokenKey(userKey));
         if (!isLogin) {

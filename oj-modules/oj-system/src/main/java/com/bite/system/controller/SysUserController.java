@@ -1,7 +1,11 @@
 package com.bite.system.controller;
 
+import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.controller.BaseController;
+import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
+import com.bite.common.core.domain.vo.LoginUserVO;
+import com.bite.common.core.enums.ResultCode;
 import com.bite.system.domain.dto.LoginDTO;
 import com.bite.system.domain.dto.SysUserSaveDTO;
 import com.bite.system.domain.vo.SysUserVO;
@@ -71,6 +75,22 @@ public class SysUserController extends BaseController {
     @ApiResponse(responseCode = "3101", description = "用户不存在")
     public R<SysUserVO> detail(@RequestParam(required = true) Long userId, @RequestParam(required = false) String sex) {
         return null;
+    }
+
+    /*
+    * 获取当前用户信息
+     */
+    @GetMapping("/info")
+    public R<LoginUserVO> info(@RequestHeader(HttpConstants.AUTHENTICATION) String token){
+        return sysUserService.info(token);
+    }
+
+    /*
+    退出登录
+     */
+    @DeleteMapping("/logout")
+    public R<Void> logout(@RequestHeader(HttpConstants.AUTHENTICATION) String token){
+        return toR(sysUserService.logout(token)) ;
     }
 
 

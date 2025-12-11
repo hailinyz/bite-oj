@@ -1,8 +1,13 @@
 package com.bite.system.service.Impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.bite.common.core.constants.HttpConstants;
+import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
+import com.bite.common.core.domain.vo.LoginUserVO;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.security.exception.ServiceException;
@@ -39,7 +44,8 @@ public class SysUserServiceImpl implements ISysUserService {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         // select password from tb_sys_user where user_account = #{userAccount}
         SysUser sysUser = sysUserMapper.selectOne(queryWrapper
-                .select(SysUser::getUserId, SysUser::getPassword).eq(SysUser::getUserAccount, userAccount));
+                .select(SysUser::getUserId, SysUser::getPassword,SysUser::getNickName)
+                .eq(SysUser::getUserAccount, userAccount));
 
 /*        R loginResult = new R();*/
         if (sysUser == null){
@@ -54,7 +60,8 @@ public class SysUserServiceImpl implements ISysUserService {
             return loginResult;*/
 
             // jwttoken = 生成jwttoken的方法
-            String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue());
+            String token = tokenService.createToken(sysUser.getUserId(),
+                    secret, UserIdentity.ADMIN.getValue(),sysUser.getNickName());
             return R.ok(token);
         }
 /*        loginResult.setCode(ResultCode.FAILED_LOGIN.getCode());
@@ -83,6 +90,36 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setUserAccount(sysUserSaveDTO.getUserAccount());
         sysUser.setPassword(BCryptUtils.encryptPassword(sysUserSaveDTO.getPassword()));
         return sysUserMapper.insert(sysUser);
+    }
+
+    /*
+    * 获取用户信息
+     */
+    @Override
+    public R<LoginUserVO> info(String token) {
+        if (StrUtil.isNotEmpty(token) &&
+                token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        LoginUser loginUser = tokenService.getLoginUser(token, secret);
+        if (loginUser == null){
+            return R.fail();
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        loginUserVO.setNickName(loginUser.getNickName());
+        return R.ok(loginUserVO);
+    }
+
+    /*
+    * 登出
+     */
+    @Override
+    public boolean logout(String token) {
+        if (StrUtil.isNotEmpty(token) &&
+                token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        return tokenService.deleteLoginUser(token, secret);
     }
 
 /*    private void checkParams(SysUserSaveDTO sysUserSaveDTO){
