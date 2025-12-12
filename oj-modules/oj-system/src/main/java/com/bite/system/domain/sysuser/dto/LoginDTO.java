@@ -1,4 +1,4 @@
-package com.bite.system.domain.dto;
+package com.bite.system.domain.sysuser.dto;
 
 import lombok.Getter;
 import lombok.Setter;

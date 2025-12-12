@@ -1,4 +1,4 @@
-package com.bite.system.domain.dto;
+package com.bite.system.domain.sysuser.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

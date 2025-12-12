@@ -1,4 +1,4 @@
-package com.bite.system.domain;
+package com.bite.system.domain.sysuser;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;

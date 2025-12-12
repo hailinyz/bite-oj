@@ -1,21 +1,20 @@
-package com.bite.system.service.Impl;
+package com.bite.system.service.sysuser.Impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
-import com.bite.common.core.domain.vo.LoginUserVO;
+import com.bite.system.domain.sysuser.vo.LoginUserVO;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.common.security.service.TokenService;
-import com.bite.system.domain.SysUser;
-import com.bite.system.domain.dto.SysUserSaveDTO;
-import com.bite.system.mapper.SysUserMapper;
-import com.bite.system.service.ISysUserService;
+import com.bite.system.domain.sysuser.SysUser;
+import com.bite.system.domain.sysuser.dto.SysUserSaveDTO;
+import com.bite.system.mapper.sysuser.SysUserMapper;
+import com.bite.system.service.sysuser.ISysUserService;
 import com.bite.system.utils.BCryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

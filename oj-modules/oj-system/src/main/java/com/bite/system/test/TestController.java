@@ -3,7 +3,7 @@ package com.bite.system.test;
 import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.redis.service.RedisService;
-import com.bite.system.domain.SysUser;
+import com.bite.system.domain.sysuser.SysUser;
 import com.bite.system.test.domain.ValidationDTO;
 import com.bite.system.test.service.ITestService;
 import lombok.extern.slf4j.Slf4j;

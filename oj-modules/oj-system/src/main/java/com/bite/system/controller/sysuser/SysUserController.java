@@ -1,15 +1,13 @@
-package com.bite.system.controller;
+package com.bite.system.controller.sysuser;
 
 import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.controller.BaseController;
-import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
-import com.bite.common.core.domain.vo.LoginUserVO;
-import com.bite.common.core.enums.ResultCode;
-import com.bite.system.domain.dto.LoginDTO;
-import com.bite.system.domain.dto.SysUserSaveDTO;
-import com.bite.system.domain.vo.SysUserVO;
-import com.bite.system.service.ISysUserService;
+import com.bite.system.domain.sysuser.vo.LoginUserVO;
+import com.bite.system.domain.sysuser.dto.LoginDTO;
+import com.bite.system.domain.sysuser.dto.SysUserSaveDTO;
+import com.bite.system.domain.sysuser.vo.SysUserVO;
+import com.bite.system.service.sysuser.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
