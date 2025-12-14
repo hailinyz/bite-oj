@@ -5,6 +5,7 @@ import com.bite.common.core.domain.R;
 import com.bite.common.core.domain.TableDataInfo;
 import com.bite.system.domain.exam.dto.ExamAddDTO;
 import com.bite.system.domain.exam.dto.ExamQueryDTO;
+import com.bite.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.bite.system.service.exam.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +26,19 @@ public class ExamController extends BaseController {
     }
 
     /*
-    * 添加竞赛
+    * 添加竞赛 - 不包含题目的新增
      */
     @PostMapping("/add")
     public R<Void> add(@RequestBody ExamAddDTO examAddDTO){
         return toR(examService.add(examAddDTO));
+    }
+
+    /*
+    * 添加竞赛 - 包含题目的新增
+     */
+    @PostMapping("/question/add")
+    public R<Void> questionaAdd(@RequestBody ExamQuestionAddDTO examQuestionAddDTO){
+        return toR(examService.addQuestion(examQuestionAddDTO));
     }
 
 }
