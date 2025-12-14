@@ -1,0 +1,19 @@
+package com.bite.system.domain.exam.dto;
+
+import com.bite.common.core.domain.PageQueryDTO;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+//属性就是发起请求时候前端会传递什么参数
+@Getter
+@Setter
+public class ExamQueryDTO extends PageQueryDTO {
+
+    private String title;
+
+    private String startTime;
+
+    private String endTime;
+}
