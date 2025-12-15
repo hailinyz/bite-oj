@@ -9,6 +9,7 @@ import com.bite.common.security.exception.ServiceException;
 import com.bite.system.domain.exam.Exam;
 import com.bite.system.domain.exam.ExamQuestion;
 import com.bite.system.domain.exam.dto.ExamAddDTO;
+import com.bite.system.domain.exam.dto.ExamEditDTO;
 import com.bite.system.domain.exam.dto.ExamQueryDTO;
 import com.bite.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.bite.system.domain.exam.vo.ExamDtailVO;
@@ -56,20 +57,7 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     @Override
     public String add(ExamAddDTO examAddDTO) {
 
-        //竞赛名称的重复性校验
-        List<Exam> examList = examMapper
-                .selectList(new LambdaQueryWrapper<Exam>()
-                        .eq(Exam::getTitle, examAddDTO.getTitle()));
-        if (CollectionUtil.isNotEmpty(examList)) {
-            throw new ServiceException(ResultCode.FAILED_ALREADY_EXISTS);
-        }
-        //进行时间的校验
-        if (examAddDTO.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new ServiceException(ResultCode.EXAM_START_TIME_BEFORE_CURRENT_TIME);
-        }
-        if (examAddDTO.getStartTime().isAfter(examAddDTO.getEndTime())) {
-            throw new ServiceException(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
-        }
+        checkExamSaveParams(examAddDTO, null);
 
         //处理传过来的参数，将DTO转为实体
         Exam exam = new Exam();
@@ -130,6 +118,21 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     }
 
     /*
+    编辑竞赛基本信息
+     */
+    @Override
+    public int edit(ExamEditDTO examEditDTO) {
+        Exam exam = getExam(examEditDTO.getExamId());
+        checkExamSaveParams(examEditDTO, examEditDTO.getExamId());
+        //更新并且对时间、标题等进行校验
+        exam.setTitle(examEditDTO.getTitle());
+        exam.setStartTime(examEditDTO.getStartTime());
+        exam.setEndTime(examEditDTO.getEndTime());
+        //将更新的数据保存到数据库中
+        return examMapper.updateById(exam);
+    }
+
+    /*
     * 批量保存
      */
     private boolean saveExamQuestion(ExamQuestionAddDTO examQuestionAddDTO, Set<Long> questionIdSet) {
@@ -152,6 +155,9 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         return saveBatch(examQuestionList);
     }
 
+    /*
+    * 根据id查询竞赛信息
+     */
     private Exam getExam(Long examId) {
         //对参数进行校验：对竞赛id判断 和 题目id集合判断
         Exam exam = examMapper.selectById(examId);
@@ -159,6 +165,28 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
         return exam;
+    }
+
+    /*
+    * 添加竞赛参数校验
+     */
+    private void checkExamSaveParams(ExamAddDTO examsaveDTO,Long examId) {
+        //1. 对竞赛标题是否重复进行校验  2.竞赛开始、结束时间进行校验
+        //竞赛名称的重复性校验
+        List<Exam> examList = examMapper
+                .selectList(new LambdaQueryWrapper<Exam>()
+                        .eq(Exam::getTitle, examsaveDTO.getTitle())
+                        .ne(examId != null,Exam::getExamId, examId));
+        if (CollectionUtil.isNotEmpty(examList)) {
+            throw new ServiceException(ResultCode.FAILED_ALREADY_EXISTS);
+        }
+        //进行时间的校验
+        if (examsaveDTO.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new ServiceException(ResultCode.EXAM_START_TIME_BEFORE_CURRENT_TIME);
+        }
+        if (examsaveDTO.getStartTime().isAfter(examsaveDTO.getEndTime())) {
+            throw new ServiceException(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
+        }
     }
 
 

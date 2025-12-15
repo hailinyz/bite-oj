@@ -5,6 +5,7 @@ import com.bite.common.core.domain.R;
 import com.bite.common.core.domain.TableDataInfo;
 import com.bite.system.domain.exam.Exam;
 import com.bite.system.domain.exam.dto.ExamAddDTO;
+import com.bite.system.domain.exam.dto.ExamEditDTO;
 import com.bite.system.domain.exam.dto.ExamQueryDTO;
 import com.bite.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.bite.system.domain.exam.vo.ExamDtailVO;
@@ -49,6 +50,14 @@ public class ExamController extends BaseController {
     @GetMapping("/detail")
     public R<ExamDtailVO> detail(Long examId){
         return R.ok(examService.detail(examId));
+    }
+
+    /*
+    * 编辑竞赛基本信息
+     */
+    @PutMapping("/edit")
+    public R<Void> edit(@RequestBody ExamEditDTO examEditDTO){
+        return toR(examService.edit(examEditDTO));
     }
 
 }
