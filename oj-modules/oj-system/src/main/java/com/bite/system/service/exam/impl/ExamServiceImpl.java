@@ -11,8 +11,10 @@ import com.bite.system.domain.exam.ExamQuestion;
 import com.bite.system.domain.exam.dto.ExamAddDTO;
 import com.bite.system.domain.exam.dto.ExamQueryDTO;
 import com.bite.system.domain.exam.dto.ExamQuestionAddDTO;
+import com.bite.system.domain.exam.vo.ExamDtailVO;
 import com.bite.system.domain.exam.vo.ExamVO;
 import com.bite.system.domain.question.Question;
+import com.bite.system.domain.question.vo.QuestionVO;
 import com.bite.system.mapper.exam.examMapper;
 import com.bite.system.mapper.exam.examQuestionMapper;
 import com.bite.system.mapper.question.QuestionMapper;
@@ -52,7 +54,7 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     * 添加竞赛 - 不包含题目的新增
      */
     @Override
-    public int add(ExamAddDTO examAddDTO) {
+    public String add(ExamAddDTO examAddDTO) {
 
         //竞赛名称的重复性校验
         List<Exam> examList = examMapper
@@ -72,7 +74,8 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         //处理传过来的参数，将DTO转为实体
         Exam exam = new Exam();
         BeanUtil.copyProperties(examAddDTO,exam);
-        return examMapper.insert(exam);
+        examMapper.insert(exam);
+        return exam.getExamId().toString();
     }
 
     /*
@@ -81,21 +84,49 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     @Override
     public boolean addQuestion(ExamQuestionAddDTO examQuestionAddDTO) {
         //对参数进行校验：对竞赛id判断 和 题目id集合判断
-        Exam exam = getExam(examQuestionAddDTO); //第一处优化
+        Exam exam = getExam(examQuestionAddDTO.getExamId()); //第一处优化
         Set<Long> questionIdSet = examQuestionAddDTO.getQuestionIdSet();
         if (CollectionUtil.isEmpty(questionIdSet)){
             return true;
         }
-
         //批量查询
         List<Question> questionList = questionMapper.selectBatchIds(questionIdSet);
         if (CollectionUtil.isEmpty(questionList) || questionList.size() != questionIdSet.size()){
             throw new ServiceException(ResultCode.EXAM_QUESTION_NOT_EXISTS);
         }
-
         //批量保存
         return saveExamQuestion(examQuestionAddDTO, questionIdSet);
+    }
 
+    /*
+    * 根据id查询竞赛详情
+     */
+    @Override
+    public ExamDtailVO detail(Long examId) {
+        ExamDtailVO examDtailVO = new ExamDtailVO();
+        //获取竞赛基本信息
+        Exam exam = getExam(examId);
+        BeanUtil.copyProperties(exam,examDtailVO);
+        //获取题目id集合
+        List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
+                .select(ExamQuestion::getQuestionId)
+                .eq(ExamQuestion::getExamId, examId)
+                .orderByAsc(ExamQuestion::getQuestionOrder));
+        if (CollectionUtil.isEmpty(examQuestionList)){ //有可能是没有题目的竞赛
+            //只包含竞赛基本信息
+            return examDtailVO;
+        }
+        //先拿到题目id的集合到新的List 集合中
+        List<Long> questionIdList = examQuestionList.stream().map(ExamQuestion::getQuestionId).toList();
+        //批量在题目表中根据id集合查询
+        List<Question> questionList = questionMapper.selectList(new LambdaQueryWrapper<Question>()
+                .select(Question::getQuestionId, Question::getTitle, Question::getDifficulty)
+                .in(Question::getQuestionId, questionIdList));
+        //将题目信息转为VO
+//        List<QuestionVO> quesiontVOList = new ArrayList<>();
+        List<QuestionVO> quesiontVOList = BeanUtil.copyToList(questionList,QuestionVO.class);
+        examDtailVO.setExamQuestionList(quesiontVOList);
+        return examDtailVO;
     }
 
     /*
@@ -121,9 +152,9 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         return saveBatch(examQuestionList);
     }
 
-    private Exam getExam(ExamQuestionAddDTO examQuestionAddDTO) {
+    private Exam getExam(Long examId) {
         //对参数进行校验：对竞赛id判断 和 题目id集合判断
-        Exam exam = examMapper.selectById(examQuestionAddDTO.getExamId());
+        Exam exam = examMapper.selectById(examId);
         if (exam == null) {
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
