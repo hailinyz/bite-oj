@@ -45,6 +45,14 @@ public class ExamController extends BaseController {
     }
 
     /*
+     * 删除竞赛中的题目
+     */
+    @DeleteMapping("/question/delete")
+    public R<Void> questionDelete(Long examId, Long questionId){
+        return toR(examService.questionDelete(examId, questionId));
+    }
+
+    /*
     * 获取竞赛详情
      */
     @GetMapping("/detail")
@@ -59,5 +67,15 @@ public class ExamController extends BaseController {
     public R<Void> edit(@RequestBody ExamEditDTO examEditDTO){
         return toR(examService.edit(examEditDTO));
     }
+
+    /*
+    * 删除竞赛
+     */
+    @DeleteMapping("/delete")
+    public R<Void> delete(Long examId){
+        return toR(examService.delete(examId));
+    }
+
+
 
 }

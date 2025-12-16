@@ -1,9 +1,12 @@
 package com.bite.system.service.question.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.bite.common.core.constants.Constants;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.security.exception.ServiceException;
+import com.bite.system.domain.exam.Exam;
 import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.dto.QuestionAddDTO;
 import com.bite.system.domain.question.dto.QuestionEditDTO;
@@ -17,7 +20,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements IQuestionService {
@@ -30,6 +37,14 @@ public class QuestionServiceImpl implements IQuestionService {
      */
     @Override
     public List<QuestionVO> list(QuestionQueryDTO questionQueryDTO) {
+        String excludeIdStr = questionQueryDTO.getExcludeIdStr();
+        if (StrUtil.isNotEmpty(excludeIdStr)){
+            String[] excludeIdArr = excludeIdStr.split(Constants.SPLIT_SEM);
+            Set<Long> excludeIdSet = Arrays.stream(excludeIdArr)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toSet());
+            questionQueryDTO.setExcludeIdSet(excludeIdSet);
+        }
         PageHelper.startPage(questionQueryDTO.getPageNum(),questionQueryDTO.getPageSize());
         return questionMapper.selectQuestionList(questionQueryDTO);
     }
@@ -103,6 +118,15 @@ public class QuestionServiceImpl implements IQuestionService {
         }
         return questionMapper.deleteById(questionId);
     }
+
+    /*
+    判断竞赛能否被进行操作
+     */
+/*    private static void checkExam(Exam exam) {
+        if (exam.getStartTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_STARTED);
+        }
+    }*/
 
 
 }

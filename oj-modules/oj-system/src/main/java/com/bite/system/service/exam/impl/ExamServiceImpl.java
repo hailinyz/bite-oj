@@ -73,6 +73,7 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     public boolean addQuestion(ExamQuestionAddDTO examQuestionAddDTO) {
         //对参数进行校验：对竞赛id判断 和 题目id集合判断
         Exam exam = getExam(examQuestionAddDTO.getExamId()); //第一处优化
+        checkExam(exam);
         Set<Long> questionIdSet = examQuestionAddDTO.getQuestionIdSet();
         if (CollectionUtil.isEmpty(questionIdSet)){
             return true;
@@ -123,6 +124,7 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     @Override
     public int edit(ExamEditDTO examEditDTO) {
         Exam exam = getExam(examEditDTO.getExamId());
+        checkExam(exam);
         checkExamSaveParams(examEditDTO, examEditDTO.getExamId());
         //更新并且对时间、标题等进行校验
         exam.setTitle(examEditDTO.getTitle());
@@ -130,6 +132,44 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         exam.setEndTime(examEditDTO.getEndTime());
         //将更新的数据保存到数据库中
         return examMapper.updateById(exam);
+    }
+
+    /*
+    判断竞赛能否被进行操作
+     */
+    private static void checkExam(Exam exam) {
+        if (exam.getStartTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_STARTED);
+        }
+    }
+
+    /*
+    删除竞赛中题目
+     */
+    @Override
+    public int questionDelete(Long examId, Long questionId) {
+        Exam exam = getExam(examId);
+        checkExam(exam);
+        int delete = examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getExamId, examId)
+                .eq(ExamQuestion::getQuestionId, questionId));
+        return delete;
+    }
+
+    /*
+    删除竞赛
+     */
+    @Override
+    public int delete(Long examId) {
+        //判断竞赛是否存在
+        Exam exam = getExam(examId);
+        //判断竞赛是否开始
+        checkExam(exam);
+        //删除竞赛中的题目
+        examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getExamId, examId));
+        //删除竞赛
+        return examMapper.deleteById(exam);
     }
 
     /*
