@@ -28,4 +28,6 @@ public interface ExamService {
     int delete(Long examId);
 
     int publish(Long examId);
+
+    int cancelpublish(Long examId);
 }

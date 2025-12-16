@@ -192,6 +192,19 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     }
 
     /*
+    撤销发布
+     */
+    @Override
+    public int cancelpublish(Long examId) {
+        //判断竞赛是否存在
+        Exam exam = getExam(examId);
+        //判断竞赛是否开始
+        checkExam(exam);
+        exam.setStatus(Constants.FALSE);
+        return examMapper.updateById(exam);
+    }
+
+    /*
     * 批量保存
      */
     private boolean saveExamQuestion(ExamQuestionAddDTO examQuestionAddDTO, Set<Long> questionIdSet) {
