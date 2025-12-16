@@ -26,6 +26,8 @@ public enum ResultCode {
     FAILED_LOGIN (3103, "账号或密码错误"),
     FAILED_USER_BANNED (3104, "您已被列⼊⿊名单, 请联系管理员."),
 
+    FAILED_USER_PHONE (3105, "你输入的手机号有误"),
+
     EXAM_START_TIME_BEFORE_CURRENT_TIME (3201, "竞赛开始时间不能早于当前时间"),
     EXAM_START_TIME_AFTER_END_TIME (3201, "竞赛开始时间不能晚于结束时间"),
     EXAM_NOT_EXISTS (3202, "竞赛不存在"),
@@ -34,6 +36,8 @@ public enum ResultCode {
     EXAM_STARTED (3204, "该竞赛已开始,无法进行编辑操作"),
 
     EXAM_NOT_HAS_QUESTION (3205, "竞赛当中没有题目");
+
+
 
 
     private int code;
