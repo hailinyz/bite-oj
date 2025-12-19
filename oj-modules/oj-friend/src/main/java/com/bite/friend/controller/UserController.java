@@ -23,7 +23,7 @@ public class UserController extends BaseController {
     @PostMapping("/sendCode")
     //返回值使用Void，是因为无需给前端，给手机，为了安全
     public R<Void> sendCode(@RequestBody UserDTO userDTO) { //因为传的是手机号，为了避免被XSS攻击，使用DTO
-         userService.sendCode(userDTO);
+         return toR(userService.sendCode(userDTO));
     }
 
 }

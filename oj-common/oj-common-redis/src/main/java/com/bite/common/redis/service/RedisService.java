@@ -100,6 +100,14 @@ public class RedisService {
         }
         return JSON.parseObject(String.valueOf(t), clazz);
     }
+
+    /*
+    计数的操作 + 1
+     */
+    public Long increment(final String key){
+       return redisTemplate.opsForValue().increment(key);
+    }
+
     //*************** 操作list结构 ****************
     /**
      * 获取list中存储数据数量

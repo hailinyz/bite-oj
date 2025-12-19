@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>oj-system</module>
-        <module>oj-system</module>
         <module>oj-friend</module>
         <module>oj-job</module>
         <module>oj-judge</module>
