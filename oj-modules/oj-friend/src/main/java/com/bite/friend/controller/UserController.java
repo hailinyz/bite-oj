@@ -26,4 +26,12 @@ public class UserController extends BaseController {
          return toR(userService.sendCode(userDTO));
     }
 
+    /*
+    登录注册
+     */
+    @PostMapping("code/login")
+    public R<String> codeLogin(@RequestBody UserDTO userDTO) {
+        return R.ok(userService.codeLogin(userDTO.getPhone(), userDTO.getCode()));
+    }
+
 }

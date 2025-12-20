@@ -1,18 +1,29 @@
 package com.bite.friend.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bite.common.core.constants.CacheConstants;
+import com.bite.common.core.constants.Constants;
 import com.bite.common.core.enums.ResultCode;
+import com.bite.common.core.enums.UserIdentity;
+import com.bite.common.core.enums.UserStatus;
 import com.bite.common.message.service.MockSmsService;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.security.exception.ServiceException;
+import com.bite.common.security.service.TokenService;
+import com.bite.friend.domain.User;
 import com.bite.friend.domain.dto.UserDTO;
 import com.bite.friend.mapper.UserMapper;
 import com.bite.friend.service.IUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -29,11 +40,23 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private TokenService tokenService;
+
     @Value("${sms.code-expiration:5}") //获取nacos配置文件中的过期时间
     private Long phoneCodeExpiration; //手机验证码的过期时间
 
     @Value("${sms.send-limit:3}")
     private Integer sendLimit;
+
+    @Value("${jwt.secret}") //获取nacos配置文件中的盐
+    private String secret;
+
+    @Value("${sms.is-send:false}")
+    private boolean isSend; //开关打开：true 关闭：false
 
     /*
     获取验证码
@@ -61,14 +84,17 @@ public class UserServiceImpl implements IUserService {
         }
 
         //生成验证码
-        String code = RandomUtil.randomNumbers(6);
+        String code = isSend ? RandomUtil.randomNumbers(6) : Constants.DEFAULT_CODE;
         //存储到redis中 数据结构：String key：p:c:手机号 value：code
         redisService.setCacheObject(phoneCodeKey, code, phoneCodeExpiration, TimeUnit.MINUTES);
-        //发送验证码
-        boolean sendMobileCode = mockSmsService.sendMobileCode(userDTO.getPhone(), code);
-        if (!sendMobileCode){
-            throw new ServiceException(ResultCode.FAILED_SEND_CODE);
+        if (isSend){
+            //发送验证码
+            boolean sendMobileCode = mockSmsService.sendMobileCode(userDTO.getPhone(), code);
+            if (!sendMobileCode){
+                throw new ServiceException(ResultCode.FAILED_SEND_CODE);
+            }
         }
+
         //记录发送的次数
         redisService.increment(codeTimeKey);
         if (sendTimes == null){ //说明当天第一次发送获取验证码请求
@@ -82,6 +108,66 @@ public class UserServiceImpl implements IUserService {
 
     }
 
+    /*
+    登录注册
+     */
+    @Override
+    public String codeLogin(String phone, String code) {
+        //验证码的比对
+        checkCode(phone, code);
+
+        //判断新老用户
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, phone));
+        if (user == null){ //新用户
+            //注册逻辑
+            user = new User();
+            user.setPhone(phone);
+            user.setStatus(UserStatus.Normal.getValue());
+            userMapper.insert(user);
+        }
+
+        //生成token
+        return tokenService.createToken(user.getUserId(), secret, UserIdentity.ORDINARY.getValue(),user.getNickName());
+
+/*        if (user != null){ //说明是老用户
+            String phoneCodeKey = getPhoneCodeKey(phone);
+            //获取redis中存储的验证码
+            String cacheCode = redisService.getCacheObject(phoneCodeKey, String.class);
+            //判断验证码是否是空
+            if (StrUtil.isEmptyIfStr(cacheCode)){
+                throw new ServiceException(ResultCode.FAILED_INVALID_CODE);
+            }
+            if (!cacheCode.equals(code)){
+                throw new ServiceException(ResultCode.FAILED_ERROR_CODE);
+            }
+            //验证码已经比对成功，删除redis中的验证码
+            redisService.deleteObject(phoneCodeKey);
+            //生成token
+            return tokenService.createToken(user.getUserId(), secret, UserIdentity.ORDINARY.getValue(),user.getNickName());
+        }*/
+
+        //新用户.在上面
+    }
+
+
+
+    /*
+    验证码比对
+     */
+    private void checkCode(String phone, String code) {
+        String phoneCodeKey = getPhoneCodeKey(phone);
+        //获取redis中存储的验证码
+        String cacheCode = redisService.getCacheObject(phoneCodeKey, String.class);
+        //判断验证码是否是空
+        if (StrUtil.isEmptyIfStr(cacheCode)){
+            throw new ServiceException(ResultCode.FAILED_INVALID_CODE);
+        }
+        if (!cacheCode.equals(code)){
+            throw new ServiceException(ResultCode.FAILED_ERROR_CODE);
+        }
+        //验证码已经比对成功，删除redis中的验证码
+        redisService.deleteObject(phoneCodeKey);
+    }
 
 
     /*

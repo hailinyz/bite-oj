@@ -23,11 +23,11 @@
             <artifactId>oj-common-message</artifactId>
             <version>${oj-common-message.version}</version>
         </dependency>
-<!--        &lt;!&ndash; MySQL 驱动 &ndash;&gt;
+        <!-- MySQL 驱动 -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-        </dependency>-->
+        </dependency>
 
     </dependencies>
 
