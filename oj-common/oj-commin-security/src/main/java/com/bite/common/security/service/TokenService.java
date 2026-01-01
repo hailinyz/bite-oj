@@ -23,7 +23,7 @@ public class TokenService {
     private RedisService redisService;
 
 
-    public String createToken(Long userId, String secret,Integer identity,String nickName){
+    public String createToken(Long userId, String secret,Integer identity,String nickName, String headImage){
 
         Map<String, Object> claims = new HashMap<>();
         String userKey = UUID.fastUUID().toString();
@@ -41,6 +41,7 @@ public class TokenService {
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity);
         loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
         redisService.setCacheObject(tokenkey, loginUser,CacheConstants.EXP, TimeUnit.MINUTES);
 
         return token;

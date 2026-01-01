@@ -60,7 +60,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
             // jwttoken = 生成jwttoken的方法
             String token = tokenService.createToken(sysUser.getUserId(),
-                    secret, UserIdentity.ADMIN.getValue(),sysUser.getNickName());
+                    secret, UserIdentity.ADMIN.getValue(),sysUser.getNickName(), null);
             return R.ok(token);
         }
 /*        loginResult.setCode(ResultCode.FAILED_LOGIN.getCode());

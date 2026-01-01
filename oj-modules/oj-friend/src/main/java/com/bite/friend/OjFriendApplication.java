@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @SpringBootApplication
-@MapperScan("com.bite.**.mapper")
+@MapperScan("com.bite.friend.mapper")
 public class OjFriendApplication {
     public static void main(String[] args) {
         SpringApplication.run(OjFriendApplication.class, args);

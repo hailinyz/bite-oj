@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bite.common.core.constants.CacheConstants;
 import com.bite.common.core.constants.Constants;
+import com.bite.common.core.constants.HttpConstants;
+import com.bite.common.core.domain.LoginUser;
+import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.core.enums.UserStatus;
@@ -17,6 +20,7 @@ import com.bite.friend.domain.User;
 import com.bite.friend.domain.dto.UserDTO;
 import com.bite.friend.mapper.UserMapper;
 import com.bite.friend.service.IUserService;
+import com.bite.system.domain.sysuser.vo.LoginUserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -127,7 +131,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         //生成token
-        return tokenService.createToken(user.getUserId(), secret, UserIdentity.ORDINARY.getValue(),user.getNickName());
+        return tokenService.createToken(user.getUserId(), secret, UserIdentity.ORDINARY.getValue(),user.getNickName(), user.getHeadImage());
 
 /*        if (user != null){ //说明是老用户
             String phoneCodeKey = getPhoneCodeKey(phone);
@@ -147,6 +151,37 @@ public class UserServiceImpl implements IUserService {
         }*/
 
         //新用户.在上面
+    }
+
+    /*
+     * 退出登录
+     */
+    @Override
+    public boolean logout(String token) {
+        if (StrUtil.isNotEmpty(token) &&
+                token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        return tokenService.deleteLoginUser(token, secret);
+    }
+
+    /*
+     * 获取用户信息
+     */
+    @Override
+    public R<LoginUserVO> info(String token) {
+        if (StrUtil.isNotEmpty(token) &&
+                token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        LoginUser loginUser = tokenService.getLoginUser(token, secret);
+        if (loginUser == null){
+            return R.fail();
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        loginUserVO.setNickName(loginUser.getNickName());
+        loginUserVO.setHeadImage(loginUser.getHeadImage());
+        return R.ok(loginUserVO);
     }
 
 

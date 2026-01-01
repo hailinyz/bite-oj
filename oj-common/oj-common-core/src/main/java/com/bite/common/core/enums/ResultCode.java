@@ -27,7 +27,7 @@ public enum ResultCode {
     FAILED_USER_BANNED (3104, "您已被列⼊⿊名单, 请联系管理员."),
     FAILED_USER_PHONE (3105, "你输入的手机号有误"),
     FAILED_FREQUENT (3106, "操作频繁，请1分钟后重试"),
-    FAILED_TIME_LIMIT(3107, "当天请求次数已达到上限"),
+    FAILED_TIME_LIMIT(3107, "当天请求验证码次数已达到上限"),
     FAILED_SEND_CODE(3108, "验证码发送错误"),
     FAILED_INVALID_CODE(3109, "验证码无效"),
     FAILED_ERROR_CODE(3110, "验证码错误"),
