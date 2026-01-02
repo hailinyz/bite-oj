@@ -39,7 +39,9 @@ public enum ResultCode {
 
     EXAM_STARTED (3204, "该竞赛已开始,无法进行编辑操作"),
 
-    EXAM_NOT_HAS_QUESTION (3205, "竞赛当中没有题目");
+    EXAM_NOT_HAS_QUESTION (3205, "竞赛当中没有题目"),
+
+    EXAM_IS_FINISH (3206, "竞赛已经结束不能进行操作");
 
 
 

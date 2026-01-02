@@ -1,4 +1,4 @@
-package com.bite.friend.domain.dto;
+package com.bite.friend.domain.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;

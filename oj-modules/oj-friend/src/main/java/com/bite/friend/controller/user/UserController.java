@@ -1,10 +1,10 @@
-package com.bite.friend.controller;
+package com.bite.friend.controller.user;
 
 import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
-import com.bite.friend.domain.dto.UserDTO;
-import com.bite.friend.service.IUserService;
+import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.service.user.IUserService;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

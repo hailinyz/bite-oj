@@ -1,4 +1,4 @@
-package com.bite.friend.domain;
+package com.bite.friend.domain.user;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

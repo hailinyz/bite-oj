@@ -11,6 +11,12 @@ public class CacheConstants {
 
     public final static String CODE_TIME_KET = "c:t:";
 
+    public final static String EXAM_UNFINISHED_LIST = "e:t:l"; // 未完成竞赛列表
+
+    public final static String EXAM_HISTORY_LIST = "e:h:l"; // 历史竞赛列表
+
+    public final static String EXAM_DETAIL = "e:d:"; // 竞赛详情信息
+
 
 
 }

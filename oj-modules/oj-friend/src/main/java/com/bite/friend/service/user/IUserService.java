@@ -1,7 +1,7 @@
-package com.bite.friend.service;
+package com.bite.friend.service.user;
 
 import com.bite.common.core.domain.R;
-import com.bite.friend.domain.dto.UserDTO;
+import com.bite.friend.domain.user.dto.UserDTO;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
 
 public interface IUserService {

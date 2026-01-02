@@ -17,6 +17,7 @@ import com.bite.system.domain.exam.vo.ExamDtailVO;
 import com.bite.system.domain.exam.vo.ExamVO;
 import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.vo.QuestionVO;
+import com.bite.system.manger.ExamCacheManager;
 import com.bite.system.mapper.exam.examMapper;
 import com.bite.system.mapper.exam.examQuestionMapper;
 import com.bite.system.mapper.question.QuestionMapper;
@@ -41,6 +42,9 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
 
     @Autowired
     private examQuestionMapper examQuestionMapper;
+
+    @Autowired
+    private ExamCacheManager examCacheManager;
 
 
     /*
@@ -180,6 +184,12 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     public int publish(Long examId) {
         //判断竞赛是否存在
         Exam exam = getExam(examId);
+
+        //已经结束的竞赛不能发布
+        if (exam.getEndTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_IS_FINISH);
+        }
+
         //判断竞赛中是否有题目 select count(*) from tb_exam_question where exam_id = #{examId}
         Long count = examQuestionMapper.selectCount(new LambdaQueryWrapper<ExamQuestion>()
                 .eq(ExamQuestion::getExamId, examId));
@@ -188,6 +198,8 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         }
         //改变状态并同步到数据库
         exam.setStatus(Constants.TRUE);
+        //要将新发布的竞赛数据存储到redis中  新发布竞赛往两个缓存里面存 e:t:l   e:d:examId
+        examCacheManager.addCache(exam);
         return examMapper.updateById(exam);
     }
 
@@ -200,7 +212,12 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
         Exam exam = getExam(examId);
         //判断竞赛是否开始
         checkExam(exam);
-        exam.setStatus(Constants.FALSE);
+        //已经结束的竞赛不能发布
+        if (exam.getEndTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_IS_FINISH);
+        }
+        exam.setStatus(Constants.FALSE);// 改变状态并同步到数据库
+        examCacheManager.deleteCache(examId);
         return examMapper.updateById(exam);
     }
 
