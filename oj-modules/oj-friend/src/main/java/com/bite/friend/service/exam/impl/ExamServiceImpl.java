@@ -1,12 +1,16 @@
 package com.bite.friend.service.exam.impl;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.bite.common.core.domain.TableDataInfo;
+import com.bite.common.redis.service.RedisService;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
-import com.bite.friend.mapper.exam.examMapper;
+import com.bite.friend.manger.ExamCacheManager;
+import com.bite.friend.mapper.exam.ExamMapper;
 import com.bite.friend.service.exam.IExamService;
-
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,10 @@ import java.util.List;
 public class ExamServiceImpl implements IExamService {
 
     @Autowired
-    private examMapper examMapper;
+    private ExamMapper examMapper;
+
+    @Autowired
+    private ExamCacheManager examCacheManager;
 
     /*
      * 查询竞赛列表（老接口--> 未加入redis优化）
@@ -31,9 +38,27 @@ public class ExamServiceImpl implements IExamService {
      * 查询竞赛列表（新接口--> 加入了redis优化）
      */
     @Override
-    public void redisList(ExamQueryDTO examQueryDTO) {
-
+    public TableDataInfo redisList(ExamQueryDTO examQueryDTO) {
+        //从redis中获取 竞赛列表数据
+        Long total = examCacheManager.getListSize(examQueryDTO.getType());
+        List<ExamVO> examVOList;
+        if (total == null || total <= 0){
+            //从数据库中获取 竞赛列表数据
+            examVOList = list(examQueryDTO);
+            //同步到redis中
+            examCacheManager.refreshCache(examQueryDTO.getType());
+            total = new PageInfo<>(examVOList).getTotal(); //获取总记录数
+        } else {
+            //从redis中获取 竞赛列表数据
+            examVOList = examCacheManager.getExamVOList(examQueryDTO);
+            total =  examCacheManager.getListSize(examQueryDTO.getType()); // 获取总记录数
+        }
+        if (CollectionUtil.isEmpty(examVOList)){ //使用hutool工具包判断集合是否为空
+            return TableDataInfo.empty(); //未查出任何数据时调用
+        }
+        return TableDataInfo.success(examVOList, total);
     }
+
 
 
 }

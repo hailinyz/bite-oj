@@ -9,7 +9,7 @@ import com.bite.friend.domain.exam.vo.ExamVO;
 
 import java.util.List;
 
-public interface examMapper extends BaseMapper<Exam> {
+public interface ExamMapper extends BaseMapper<Exam> {
 
     List<ExamVO> selectExamList(ExamQueryDTO examQueryDTO);
 }

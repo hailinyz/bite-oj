@@ -32,7 +32,7 @@ public class ExamController extends BaseController {
      */
     @GetMapping("/semiLogin/redis/list")
     public TableDataInfo redisList(ExamQueryDTO examQueryDTO){
-        examService.redisList(examQueryDTO);
+        return examService.redisList(examQueryDTO);
     }
 
 }

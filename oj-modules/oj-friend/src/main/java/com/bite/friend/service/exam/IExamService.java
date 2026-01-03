@@ -2,6 +2,7 @@ package com.bite.friend.service.exam;
 
 
 
+import com.bite.common.core.domain.TableDataInfo;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
 
@@ -11,5 +12,5 @@ public interface IExamService {
 
     List<ExamVO> list(ExamQueryDTO examQueryDTO);
 
-    void redisList(ExamQueryDTO examQueryDTO);
+    TableDataInfo redisList(ExamQueryDTO examQueryDTO);
 }
