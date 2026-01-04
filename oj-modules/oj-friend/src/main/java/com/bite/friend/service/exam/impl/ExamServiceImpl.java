@@ -39,6 +39,14 @@ public class ExamServiceImpl implements IExamService {
      */
     @Override
     public TableDataInfo redisList(ExamQueryDTO examQueryDTO) {
+        // 如果有时间过滤条件，直接查数据库
+        if (examQueryDTO.getStartTime() != null || examQueryDTO.getEndTime() != null) {
+            List<ExamVO> examVOList = list(examQueryDTO);
+            long total = new PageInfo<>(examVOList).getTotal();
+            return TableDataInfo.success(examVOList, total);
+        }
+
+        // 没有时间过滤，走缓存逻辑
         //从redis中获取 竞赛列表数据
         Long total = examCacheManager.getListSize(examQueryDTO.getType());
         List<ExamVO> examVOList;
