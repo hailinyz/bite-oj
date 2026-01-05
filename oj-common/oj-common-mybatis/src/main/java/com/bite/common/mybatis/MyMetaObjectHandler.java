@@ -22,6 +22,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
         
         //获取当前用户id
-        this.strictUpdateFill(metaObject, "updateBy", Long.class,  ThreadLocalUtil.get(Constants.USER_ID, Long.class));
+        this.strictUpdateFill(metaObject, "updateBy", Long.class, ThreadLocalUtil.get(Constants.USER_ID, Long.class));
     }
 }
