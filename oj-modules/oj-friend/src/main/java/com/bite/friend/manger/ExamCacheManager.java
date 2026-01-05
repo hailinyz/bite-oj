@@ -58,7 +58,7 @@ public class ExamCacheManager {
         List<ExamVO> examVOList = assembleExamVOList(examIdList);
         if (CollectionUtil.isEmpty(examVOList)) {
             //说明redis中数据可能有问题 从数据库中查数据并且重新刷新缓存
-            examVOList = getExamListByDB(examQueryDTO,   userId); //从数据库中获取数据
+            examVOList = getExamListByDB(examQueryDTO, userId); //从数据库中获取数据
             refreshCache(examQueryDTO.getType(),   userId);
         }
         return examVOList;
