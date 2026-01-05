@@ -47,18 +47,18 @@ public class ExamServiceImpl implements IExamService {
 
         // 没有时间过滤，走缓存逻辑
         //从redis中获取 竞赛列表数据
-        Long total = examCacheManager.getListSize(examQueryDTO.getType());
+        Long total = examCacheManager.getListSize(examQueryDTO.getType(), null);
         List<ExamVO> examVOList;
         if (total == null || total <= 0){
             //从数据库中获取 竞赛列表数据
             examVOList = list(examQueryDTO);
             //同步到redis中
-            examCacheManager.refreshCache(examQueryDTO.getType());
+            examCacheManager.refreshCache(examQueryDTO.getType(), null);
             total = new PageInfo<>(examVOList).getTotal(); //获取总记录数
         } else {
             //从redis中获取 竞赛列表数据
-            examVOList = examCacheManager.getExamVOList(examQueryDTO);
-            total =  examCacheManager.getListSize(examQueryDTO.getType()); // 获取总记录数
+            examVOList = examCacheManager.getExamVOList(examQueryDTO, null);
+            total =  examCacheManager.getListSize(examQueryDTO.getType(), null); // 获取总记录数
         }
         if (CollectionUtil.isEmpty(examVOList)){ //使用hutool工具包判断集合是否为空
             return TableDataInfo.empty(); //未查出任何数据时调用

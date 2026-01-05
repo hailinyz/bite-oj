@@ -46,4 +46,10 @@ public class TokenInterceptor implements HandlerInterceptor {
         return token;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+        ThreadLocalUtil.remove(); // 清空ThreadLocal里面的数据清理掉
+    }
+
 }

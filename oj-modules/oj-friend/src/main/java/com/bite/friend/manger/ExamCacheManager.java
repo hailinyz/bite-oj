@@ -1,5 +1,6 @@
 package com.bite.friend.manger;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -11,6 +12,7 @@ import com.bite.friend.domain.exam.Exam;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
 import com.bite.friend.mapper.exam.ExamMapper;
+import com.bite.friend.mapper.user.UserExamMapper;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,9 @@ public class ExamCacheManager {
     @Autowired
     private ExamMapper examMapper;
 
+    @Autowired
+    private UserExamMapper userExamMapper;
+
     /*
     将用户竞赛信息存储到 redis中
      */
@@ -39,29 +44,29 @@ public class ExamCacheManager {
     }
 
 
-    public Long getListSize(Integer examListType) {
-        String examListKey = getExamListKey(examListType);
+    public Long getListSize(Integer examListType, Long  userId) {
+        String examListKey = getExamListKey(examListType,  userId);
         return redisService.getListSize(examListKey);
     }
 
 
-    public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO) {
+    public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO,  Long userId) {
         int start = (examQueryDTO.getPageNum() - 1) * examQueryDTO.getPageSize();
         int end = start + examQueryDTO.getPageSize() - 1; //下标需要-1
-        String examListKey = getExamListKey(examQueryDTO.getType());
+        String examListKey = getExamListKey(examQueryDTO.getType(),   userId);
         List<Long> examIdList = redisService.getCacheListByRange(examListKey, start, end, Long.class);
         List<ExamVO> examVOList = assembleExamVOList(examIdList);
         if (CollectionUtil.isEmpty(examVOList)) {
             //说明redis中数据可能有问题 从数据库中查数据并且重新刷新缓存
-            examVOList = getExamListByDB(examQueryDTO); //从数据库中获取数据
-            refreshCache(examQueryDTO.getType());
+            examVOList = getExamListByDB(examQueryDTO,   userId); //从数据库中获取数据
+            refreshCache(examQueryDTO.getType(),   userId);
         }
         return examVOList;
     }
 
 
     //刷新缓存逻辑
-    public void refreshCache(Integer examListType) {
+    public void refreshCache(Integer examListType, Long userId) {
         List<Exam> examList = new ArrayList<>();
         if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
             //查询未完成竞赛
@@ -78,6 +83,10 @@ public class ExamCacheManager {
                     .le(Exam::getEndTime, LocalDateTime.now())
                     .eq(Exam::getStatus, Constants.TRUE)
                     .orderByDesc(Exam::getCreateTime));
+        } else if (ExamListType.USER_EXAM_LIST.getValue().equals( examListType)) {
+            //  查询用户竞赛
+            List<ExamVO> examVOList = userExamMapper.selectUserExamList(userId);
+            BeanUtil.copyToList( examList, Exam.class);
         }
         if (CollectionUtil.isEmpty(examList)) {
             return;
@@ -90,14 +99,20 @@ public class ExamCacheManager {
             examIdList.add(exam.getExamId());
         }
         redisService.multiSet(examMap); //刷新详情缓存
-        redisService.deleteObject(getExamListKey(examListType));
-        redisService.rightPushAll(getExamListKey(examListType), examIdList); //刷新列表缓存
+        redisService.deleteObject(getExamListKey(examListType, userId));
+        redisService.rightPushAll(getExamListKey(examListType, userId), examIdList); //刷新列表缓存
     }
 
 
-    private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO) {
+    private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO, Long  userId) {
         PageHelper.startPage(examQueryDTO.getPageNum(), examQueryDTO.getPageSize());
-        return examMapper.selectExamList(examQueryDTO);
+        if (ExamListType.USER_EXAM_LIST.getValue().equals( examQueryDTO.getType())){
+            // 查询我的竞赛列表
+            return userExamMapper.selectUserExamList(userId);
+        } else {
+            // 查询C端的竞赛列表
+            return examMapper.selectExamList(examQueryDTO);
+        }
     }
 
 
@@ -121,13 +136,14 @@ public class ExamCacheManager {
     }
 
 
-    private String getExamListKey(Integer examListType) {
-        if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
+    private String getExamListKey(Integer examListType, Long  userId) {
+        if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) { //  未完成列表
             return CacheConstants.EXAM_UNFINISHED_LIST;
-        } else if (ExamListType.EXAM_HISTORY_LIST.getValue().equals(examListType)) {
+        } else if (ExamListType.EXAM_HISTORY_LIST.getValue().equals(examListType)) { // 历史列表
             return CacheConstants.EXAM_HISTORY_LIST;
+        } else { // 用户竞赛列表
+             return CacheConstants.USER_EXAM_LIST + userId;
         }
-        return "";
     }
 
 
