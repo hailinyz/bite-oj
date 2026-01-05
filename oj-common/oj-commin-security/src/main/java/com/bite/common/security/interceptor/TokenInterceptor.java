@@ -1,7 +1,9 @@
 package com.bite.common.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
+import com.bite.common.core.constants.Constants;
 import com.bite.common.core.constants.HttpConstants;
+import com.bite.common.core.util.ThreadLocalUtil;
 import com.bite.common.security.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +28,9 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (StrUtil.isEmpty(token)) {
             return true;
         }
+        Long userId = tokenService.getUserId(token, secret);
+        //使用ThreadLocal保存用户ID，方便后续使用
+        ThreadLocalUtil.set(Constants.USER_ID, userId);
         tokenService.extendToken(token,secret);
         return true;
     }

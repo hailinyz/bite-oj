@@ -40,6 +40,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <hutool-all.version>5.8.22</hutool-all.version>
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
         <fastjson.version>2.0.43</fastjson.version>
+        <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
 
     </properties>
 

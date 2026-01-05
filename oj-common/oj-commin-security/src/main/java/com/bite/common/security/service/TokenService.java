@@ -85,6 +85,24 @@ public class TokenService {
         return CacheConstants.LOGIN_TOKEN_KET + token;
     }
 
+    /*
+    获取用户userId
+     */
+    public Long getUserId(String token,String secret) {
+        Claims claims;
+        try {
+            claims = JwtUtils.parseToken(token, secret); //获取令牌中信息 解析payload中信息
+            if (claims == null) {
+                log.error("解析token：{}，出现异常",token);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("解析token：{}，出现异常",token,e);
+            return null;
+        }
+        return Long.valueOf(JwtUtils.getUserId(claims)); //获取jwt中的key
+    }
+
     private String getUserKey(String  token,String secret) {
         Claims claims;
         try {

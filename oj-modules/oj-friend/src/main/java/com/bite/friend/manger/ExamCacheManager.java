@@ -30,6 +30,14 @@ public class ExamCacheManager {
     @Autowired
     private ExamMapper examMapper;
 
+    /*
+    将用户竞赛信息存储到 redis中
+     */
+    public void addUserExamCache(Long  userId, Long  examId){
+        String userExamListKey = getUserExamListKey(userId);
+        redisService.leftPushForList( userExamListKey, examId);
+    }
+
 
     public Long getListSize(Integer examListType) {
         String examListKey = getExamListKey(examListType);
@@ -126,4 +134,9 @@ public class ExamCacheManager {
     private String getDetailKey(Long examId) {
         return CacheConstants.EXAM_DETAIL + examId;
     }
+
+    private String getUserExamListKey(Long userId) {
+        return CacheConstants.USER_EXAM_LIST + userId;
+    }
+
 }

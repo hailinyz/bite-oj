@@ -2,11 +2,13 @@ package com.bite.gateway.filter;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.bite.common.core.constants.CacheConstants;
+import com.bite.common.core.constants.Constants;
 import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
+import com.bite.common.core.util.ThreadLocalUtil;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.core.util.JwtUtils;
 import com.bite.gateway.properties.IgnoreWhiteProperties;
@@ -90,6 +92,10 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 !UserIdentity.ORDINARY.getValue().equals(user.getIdentity())) {
             return unauthorizedResponse(exchange, "令牌验证失败");
         }
+
+        //存储用户userId
+        ThreadLocalUtil.set(Constants.USER_ID, userId); //网关存的话拿不到，所以可删可不删
+
         return chain.filter(exchange);
     }
     /**

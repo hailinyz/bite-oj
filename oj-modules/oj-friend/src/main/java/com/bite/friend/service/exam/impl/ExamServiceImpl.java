@@ -3,7 +3,6 @@ package com.bite.friend.service.exam.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.bite.common.core.domain.TableDataInfo;
-import com.bite.common.redis.service.RedisService;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
 import com.bite.friend.manger.ExamCacheManager;
