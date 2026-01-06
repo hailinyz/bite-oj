@@ -11,6 +11,7 @@ import com.bite.common.redis.service.RedisService;
 import com.bite.friend.domain.exam.Exam;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
+import com.bite.friend.domain.user.UserExam;
 import com.bite.friend.mapper.exam.ExamMapper;
 import com.bite.friend.mapper.user.UserExamMapper;
 import com.github.pagehelper.PageHelper;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ExamCacheManager {
@@ -62,6 +64,29 @@ public class ExamCacheManager {
             refreshCache(examQueryDTO.getType(),   userId);
         }
         return examVOList;
+    }
+
+    /*
+     获取用户所有竞赛
+     */
+    public List<Long> getAllUserExamList(Long userId) {
+        //首先拿到redis中的key (把当前用户所有报名过竞赛redis当中的key)
+         String examListKey = CacheConstants.USER_EXAM_LIST +  userId;
+         // 拿到redis中所有的 值，不需要分 割，直接获取所有数据
+        List<Long> userExamIdList = redisService.getCacheListByRange(examListKey, 0, -1, Long.class);
+        if ( CollectionUtil.isNotEmpty(userExamIdList)){
+            return userExamIdList;
+        } else  {
+            //说明redis当中没数据 从数据库中查数据并且重新刷新缓存
+            List<UserExam> userExamList = userExamMapper.selectList(new LambdaQueryWrapper<UserExam>()
+                    .eq(UserExam::getUserId, userId));
+            if ( CollectionUtil.isEmpty(userExamList)){
+                 return null;
+            }
+            refreshCache(ExamListType.USER_EXAM_LIST.getValue(),userId);
+            //最后拿到的是竞赛的 id列表
+            return  userExamList.stream().map(UserExam::getExamId).collect(Collectors.toList());
+        }
     }
 
 
@@ -147,6 +172,8 @@ public class ExamCacheManager {
     }
 
 
+
+
     private String getDetailKey(Long examId) {
         return CacheConstants.EXAM_DETAIL + examId;
     }
@@ -154,5 +181,6 @@ public class ExamCacheManager {
     private String getUserExamListKey(Long userId) {
         return CacheConstants.USER_EXAM_LIST + userId;
     }
+
 
 }

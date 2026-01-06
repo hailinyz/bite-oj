@@ -2,7 +2,9 @@ package com.bite.friend.service.exam.impl;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.bite.common.core.constants.Constants;
 import com.bite.common.core.domain.TableDataInfo;
+import com.bite.common.core.util.ThreadLocalUtil;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
 import com.bite.friend.manger.ExamCacheManager;
@@ -63,9 +65,27 @@ public class ExamServiceImpl implements IExamService {
         if (CollectionUtil.isEmpty(examVOList)){ //使用hutool工具包判断集合是否为空
             return TableDataInfo.empty(); //未查出任何数据时调用
         }
+        assembleExamVOList(examVOList); //判断当前用户是否参加竞赛
         return TableDataInfo.success(examVOList, total);
     }
 
+    /*
+     * 判断当前用户是否参加竞赛
+     */
+    private void assembleExamVOList(List<ExamVO> examVOList) {
+        //先拿到当前用户id
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        //获取当前用户所有已报名的竞赛列表
+        List<Long> userExamIdList = examCacheManager.getAllUserExamList(userId);
+        if (CollectionUtil.isEmpty(userExamIdList)){
+            return;
+        }
+        for (ExamVO examVO : examVOList) { //遍历所有竞赛列表数据(查看竞赛是否包含在用户我的竞赛里)
+            if (userExamIdList.contains(examVO.getExamId())) {
+                examVO.setEnter(true);
+            }
+        }
+    }
 
 
 }
