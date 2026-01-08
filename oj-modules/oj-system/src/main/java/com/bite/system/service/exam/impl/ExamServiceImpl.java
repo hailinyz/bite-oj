@@ -130,6 +130,9 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     public int edit(ExamEditDTO examEditDTO) {
         Exam exam = getExam(examEditDTO.getExamId());
         checkExam(exam);
+        if (Constants.TRUE.equals(exam.getStatus())){
+            throw new ServiceException(ResultCode.EXAM_IS_PUBLISH);
+        }
         checkExamSaveParams(examEditDTO, examEditDTO.getExamId());
         //更新并且对时间、标题等进行校验
         exam.setTitle(examEditDTO.getTitle());
@@ -154,6 +157,9 @@ public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestio
     @Override
     public int questionDelete(Long examId, Long questionId) {
         Exam exam = getExam(examId);
+        if (Constants.TRUE.equals(exam.getStatus())){
+            throw new ServiceException(ResultCode.EXAM_IS_PUBLISH);
+        }
         checkExam(exam);
         int delete = examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
                 .eq(ExamQuestion::getExamId, examId)

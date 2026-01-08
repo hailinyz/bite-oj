@@ -34,6 +34,16 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bite</groupId>
+            <artifactId>oj-common-file</artifactId>
+            <version>${oj-common-file}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bite</groupId>
+            <artifactId>oj-common-elasticsearch</artifactId>
+            <version>${oj-common-elasticsearch}</version>
+        </dependency>
 
     </dependencies>
 

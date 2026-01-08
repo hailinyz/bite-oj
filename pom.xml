@@ -41,6 +41,8 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
         <fastjson.version>2.0.43</fastjson.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+        <oj-common-elasticsearch>1.0-SNAPSHOT</oj-common-elasticsearch>
+        <oj-common-file>1.0-SNAPSHOT</oj-common-file>
 
     </properties>
 

@@ -6,13 +6,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bite.common.core.constants.Constants;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.security.exception.ServiceException;
-import com.bite.system.domain.exam.Exam;
 import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.dto.QuestionAddDTO;
 import com.bite.system.domain.question.dto.QuestionEditDTO;
 import com.bite.system.domain.question.dto.QuestionQueryDTO;
+import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.domain.question.vo.QuestionDetailVO;
 import com.bite.system.domain.question.vo.QuestionVO;
+import com.bite.system.elasticsearch.QuestionRepository;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.question.IQuestionService;
 import com.github.pagehelper.PageHelper;
@@ -31,6 +32,9 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    QuestionRepository questionRepository;
 
     /*
     获取题目列表接口
@@ -53,7 +57,7 @@ public class QuestionServiceImpl implements IQuestionService {
     添加题目接口
      */
     @Override
-    public int add(QuestionAddDTO questionAddDTO) {
+    public boolean add(QuestionAddDTO questionAddDTO) {
         //在添加题目之前，先判断题目标题是否已经存在，只要查看数据库中存在相同标题的题目，则返回错误
         List<Question> questionList = questionMapper.selectList(new LambdaQueryWrapper<Question>()
                 .eq(Question::getTitle, questionAddDTO.getTitle()));
@@ -65,7 +69,15 @@ public class QuestionServiceImpl implements IQuestionService {
         Question question = new Question();
         BeanUtils.copyProperties(questionAddDTO,question);
         //插入数据库
-        return questionMapper.insert(question);
+        int insert = questionMapper.insert(question);
+        if (insert <= 0){
+            return false;
+        }
+        //返回添加成功，就可以操作ES了
+        QuestionES questionES = new QuestionES();
+        BeanUtils.copyProperties(question, questionES);
+        questionRepository.save(questionES);
+        return true;
     }
 
     /*
@@ -103,6 +115,11 @@ public class QuestionServiceImpl implements IQuestionService {
         oldquestion.setQuestionCase(questionEditDTO.getQuestionCase());
         oldquestion.setDefaultCode(questionEditDTO.getDefaultCode());
         oldquestion.setMainFunc(questionEditDTO.getMainFunc());
+
+        QuestionES questionES = new QuestionES();
+        BeanUtils.copyProperties(oldquestion, questionES);
+        questionRepository.save(questionES);
+
         return questionMapper.updateById(oldquestion);
 
     }
@@ -116,6 +133,7 @@ public class QuestionServiceImpl implements IQuestionService {
         if (question == null){
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
+        questionRepository.deleteById(questionId);
         return questionMapper.deleteById(questionId);
     }
 
