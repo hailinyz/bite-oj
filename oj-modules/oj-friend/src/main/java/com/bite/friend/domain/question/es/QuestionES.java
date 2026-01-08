@@ -26,10 +26,10 @@ public class QuestionES {
     private Integer difficulty;
 
     @Field(type = FieldType.Long)
-    private Long timelimit;
+    private Long timeLimit;
 
     @Field(type = FieldType.Long)
-    private Long spacelimit;
+    private Long spaceLimit;
 
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
     private String content;
@@ -38,12 +38,11 @@ public class QuestionES {
     private String questionCase;
 
     @Field(type = FieldType.Text)
-    private String mainFunc;
+    private String mainFuc;
 
     @Field(type = FieldType.Text)
     private String defaultCode;
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime createTime;
-
 }
