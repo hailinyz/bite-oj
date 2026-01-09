@@ -4,6 +4,7 @@ import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.dto.UserUpdateDTO;
 import com.bite.friend.domain.user.vo.UserVO;
 import com.bite.friend.service.user.IUserService;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
@@ -56,6 +57,14 @@ public class UserController extends BaseController {
     @GetMapping("/detail")
     public R<UserVO> detail(){
         return R.ok(userService.detail());
+    }
+
+    /*
+     * 修改用户信息
+     */
+    @PutMapping("/edit")
+    public R<Void> edit(@RequestBody UserUpdateDTO userUpdateDTO){
+        return toR(userService.edit(userUpdateDTO));
     }
 
 }

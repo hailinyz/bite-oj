@@ -18,6 +18,7 @@ import com.bite.common.security.exception.ServiceException;
 import com.bite.common.security.service.TokenService;
 import com.bite.friend.domain.user.User;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.dto.UserUpdateDTO;
 import com.bite.friend.domain.user.vo.UserVO;
 import com.bite.friend.manger.UserCacheManager;
 import com.bite.friend.mapper.user.UserMapper;
@@ -207,6 +208,34 @@ public class UserServiceImpl implements IUserService {
         }
 
         return userVO;
+    }
+
+    /*
+    修改用户信息
+     */
+    @Override
+    public int edit(UserUpdateDTO userUpdateDTO) {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        if (userId == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        user.setNickName(userUpdateDTO.getNickName());
+        user.setSex(userUpdateDTO.getSex());
+        user.setSchoolName(userUpdateDTO.getSchoolName());
+        user.setMajorName(userUpdateDTO.getMajorName());
+        user.setPhone(userUpdateDTO.getPhone());
+        user.setEmail(userUpdateDTO.getEmail());
+        user.setWechat(userUpdateDTO.getWechat());
+        user.setIntroduce(userUpdateDTO.getIntroduce());
+        ////更新用户缓存
+        userCacheManager.refreshUser(user); //用户详情的缓存
+        tokenService.refreshLoginUser(user.getNickName(), user.getHeadImage(), //刷新当前用户的登录信息
+                ThreadLocalUtil.get(Constants.USER_KEY, String.class));
+        return userMapper.updateById(user);
     }
 
 
