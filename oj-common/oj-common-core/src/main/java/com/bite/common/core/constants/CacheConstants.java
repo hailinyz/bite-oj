@@ -2,7 +2,7 @@ package com.bite.common.core.constants;
 
 public class CacheConstants {
 
-    public final static String LOGIN_TOKEN_KET = "logintoken:";
+    public final static String LOGIN_TOKEN_KEY = "logintoken:";
     public final static long EXP = 720;
 
     public static final Long REFRESH_TIME = 180L;
@@ -18,6 +18,12 @@ public class CacheConstants {
     public final static String EXAM_DETAIL = "e:d:"; // 竞赛详情信息
 
     public final static String USER_EXAM_LIST = "u:e:l"; // 用户竞赛列表
+
+
+    public final static String USER_DETAIL = "u:d:"; // 用户详情信息
+
+    public final static long USER_EXP  = 10; // 用户缓存过期时间
+    public final static long LOGIN_TOKEN_EXP  = 720; // 登录token缓存过期时间
 
 
 }

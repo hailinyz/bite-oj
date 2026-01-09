@@ -4,6 +4,7 @@ import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.vo.UserVO;
 import com.bite.friend.service.user.IUserService;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class UserController extends BaseController {
     /*
     登录注册
      */
-    @PostMapping("code/login")
+    @PostMapping("/code/login")
     public R<String> codeLogin(@RequestBody UserDTO userDTO) {
         return R.ok(userService.codeLogin(userDTO.getPhone(), userDTO.getCode()));
     }
@@ -45,8 +46,16 @@ public class UserController extends BaseController {
      * 获取当前用户信息
      */
     @GetMapping("/info")
-    public R<LoginUserVO> info(@RequestHeader(HttpConstants.AUTHENTICATION) String token){
+    public R<LoginUserVO> info(@RequestHeader(HttpConstants.AUTHENTICATION) String token) {
         return userService.info(token);
+    }
+
+    /*
+     * 获取用户详细信息
+     */
+    @GetMapping("/detail")
+    public R<UserVO> detail(){
+        return R.ok(userService.detail());
     }
 
 }

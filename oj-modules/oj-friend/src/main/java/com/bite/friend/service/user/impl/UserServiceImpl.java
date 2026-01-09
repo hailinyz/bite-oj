@@ -11,12 +11,15 @@ import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.core.enums.UserStatus;
+import com.bite.common.core.util.ThreadLocalUtil;
 import com.bite.common.message.service.MockSmsService;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.common.security.service.TokenService;
 import com.bite.friend.domain.user.User;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.vo.UserVO;
+import com.bite.friend.manger.UserCacheManager;
 import com.bite.friend.mapper.user.UserMapper;
 import com.bite.friend.service.user.IUserService;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
@@ -41,6 +44,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserCacheManager userCacheManager;
 
     @Autowired
     private TokenService tokenService;
@@ -179,6 +185,26 @@ public class UserServiceImpl implements IUserService {
         return R.ok(loginUserVO);
     }
 
+    /*
+    获取用户详细信息
+     */
+    @Override
+    public UserVO detail() {
+
+        //首先从ThreadLocal中获取用户ID
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        if (userId == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_LOGIN);
+        }
+
+        //拿到用户ID，然后先到redis中查询，没有在到数据库中查询
+        UserVO userVO = userCacheManager.getUserById(userId);
+        if (userVO == null){
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXIST);
+        }
+
+        return userVO;
+    }
 
 
     /*

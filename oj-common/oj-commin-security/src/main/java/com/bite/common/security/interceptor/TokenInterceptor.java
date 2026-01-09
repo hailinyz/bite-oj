@@ -5,6 +5,7 @@ import com.bite.common.core.constants.Constants;
 import com.bite.common.core.constants.HttpConstants;
 import com.bite.common.core.util.ThreadLocalUtil;
 import com.bite.common.security.service.TokenService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +20,30 @@ public class TokenInterceptor implements HandlerInterceptor {
     private TokenService tokenService;
 
     @Value("${jwt.secret}")
-    private String secret;
-
+    private String secret;  //从哪个服务的配置文件中读取，取决于这个bean对象交给了哪个服务的spring容器进行管理。
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = getToken(request); //从请求头中获取token
+        String token = getToken(request);  //请求头中获取token
         if (StrUtil.isEmpty(token)) {
             return true;
         }
-        Long userId = tokenService.getUserId(token, secret);
-        //使用ThreadLocal保存用户ID，方便后续使用
+        Claims claims = tokenService.getClaims(token, secret);
+        Long userId = tokenService.getUserId(claims);
+        String userKey = tokenService.getUserKey(claims);
         ThreadLocalUtil.set(Constants.USER_ID, userId);
-        tokenService.extendToken(token,secret);
+        ThreadLocalUtil.set(Constants.USER_KEY, userKey);
+        tokenService.extendToken(claims);
         return true;
     }
 
-    /*
-    从请求头中获取token
-     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+        ThreadLocalUtil.remove();
+    }
+
+
     private String getToken(HttpServletRequest request) {
         String token = request.getHeader(HttpConstants.AUTHENTICATION);
         if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
@@ -45,11 +51,4 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         return token;
     }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-            throws Exception {
-        ThreadLocalUtil.remove(); // 清空ThreadLocal里面的数据清理掉
-    }
-
 }

@@ -45,7 +45,7 @@ public class JwtUtils {
     }
 
     public static String getUserKey(Claims claims) {
-        Object value = claims.get(JwtConstants.LOGIN_USER_KRY);
+        Object value = claims.get(JwtConstants.LOGIN_USER_KEY);
         return toStr(value);
     }
 

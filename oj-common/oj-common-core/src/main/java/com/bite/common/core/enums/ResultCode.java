@@ -44,7 +44,9 @@ public enum ResultCode {
     EXAM_IS_FINISH (3206, "竞赛已经结束不能进行操作"),
 
     USER_EXAM_HAS_ENTER (3301, "用户已报名,无需重复报名"),
-    EXAM_IS_PUBLISH (3301, "竞赛已经发布，不能进行编辑删除操作");
+    EXAM_IS_PUBLISH (3301, "竞赛已经发布，不能进行编辑删除操作"),
+    FAILED_USER_NOT_LOGIN (3302, "请先登录"),
+    FAILED_USER_NOT_EXIST (3303, "用户不存在");
 
 
 

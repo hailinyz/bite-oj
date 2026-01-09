@@ -2,6 +2,7 @@ package com.bite.friend.service.user;
 
 import com.bite.common.core.domain.R;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.vo.UserVO;
 import com.bite.system.domain.sysuser.vo.LoginUserVO;
 
 public interface IUserService {
@@ -14,4 +15,5 @@ public interface IUserService {
 
     R<LoginUserVO> info(String token);
 
+    UserVO detail();
 }

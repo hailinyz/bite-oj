@@ -9,6 +9,8 @@ public class LoginUserVO {
 
     private String nickName;
 
+//    private Integer identity; //后加的
+
     private String headImage; //头像
 
 }
