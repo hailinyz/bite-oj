@@ -46,7 +46,9 @@ public enum ResultCode {
     USER_EXAM_HAS_ENTER (3301, "用户已报名,无需重复报名"),
     EXAM_IS_PUBLISH (3301, "竞赛已经发布，不能进行编辑删除操作"),
     FAILED_USER_NOT_LOGIN (3302, "请先登录"),
-    FAILED_USER_NOT_EXIST (3303, "用户不存在");
+    FAILED_USER_NOT_EXIST (3303, "用户不存在"),
+    FAILED_FILE_UPLOAD (3304, "文件上传失败"),
+    FAILED_FILE_UPLOAD_TIME_LIMIT (3305, "当天文件上传次数超过上限");
 
 
 
