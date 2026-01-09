@@ -5,7 +5,7 @@ public class CacheConstants {
     public final static String LOGIN_TOKEN_KEY = "logintoken:";
     public final static long EXP = 720;
 
-    public static final Long REFRESH_TIME = 180L;
+    public static final long REFRESH_TIME = 3;
 
     public final static String PHONE_CODE_KET = "p:c:";
 
@@ -25,5 +25,26 @@ public class CacheConstants {
     public final static long USER_EXP  = 10; // 用户缓存过期时间
     public final static long LOGIN_TOKEN_EXP  = 720; // 登录token缓存过期时间
 
+    public final static String PHONE_CODE_KEY = "p:c:";
+
+    public final static String CODE_TIME_KEY = "c:t:";
+
+    public static final String USER_UPLOAD_TIMES_KEY = "u:u:t";
+
+    public static final String QUESTION_LIST = "q:l";
+
+    public static final String QUESTION_HOST_LIST = "q:h:l";
+
+    public static final String EXAM_QUESTION_LIST = "e:q:l:";
+
+    public static final String USER_MESSAGE_LIST = "u:m:l:";
+
+    public static final String MESSAGE_DETAIL = "m:d:";
+
+    public static final String EXAM_RANK_LIST = "e:r:l:";
+
+    public static final long DEFAULT_START = 0;
+
+    public static final long DEFAULT_END = -1;
 
 }
