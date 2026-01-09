@@ -128,6 +128,9 @@ public class UserServiceImpl implements IUserService {
             user = new User();
             user.setPhone(phone);
             user.setStatus(UserStatus.Normal.getValue());
+            // 新用户自注册，createBy设为0或-1表示系统创建
+            user.setCreateBy(0L);
+            user.setCreateTime(LocalDateTime.now());
             userMapper.insert(user);
         }
 
