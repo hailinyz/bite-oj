@@ -46,6 +46,9 @@ public class ExamCacheManager {
     }
 
 
+    /*
+    获取列表数据大小,查看redis中是否存在数据
+     */
     public Long getListSize(Integer examListType, Long  userId) {
         String examListKey = getExamListKey(examListType,  userId);
         return redisService.getListSize(examListKey);

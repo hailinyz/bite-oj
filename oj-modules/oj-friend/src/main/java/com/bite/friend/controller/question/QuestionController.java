@@ -36,4 +36,22 @@ public class QuestionController extends BaseController {
         return R.ok(questionService.detail(questionId));
     }
 
+    /*
+    获取上一题
+    题目的顺序列表  当前题目是哪个(questionId)
+    redis  list数据类型(顺序,已经排好序了) key:  q:l   value:  questionId
+     */
+    @GetMapping("preQuestion")
+    public R<String> preQuestion(Long questionId){
+        return R.ok(questionService.preQuestion(questionId));
+    }
+
+    /*
+    获取下一题
+     */
+    @GetMapping("nextQuestion")
+    public R<String> nextQuestion(Long questionId){
+        return R.ok(questionService.nextQuestion(questionId));
+    }
+
 }

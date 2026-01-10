@@ -13,6 +13,7 @@ import com.bite.friend.domain.question.es.QuestionES;
 import com.bite.friend.domain.question.vo.QuestionDetailVO;
 import com.bite.friend.domain.question.vo.QuestionVO;
 import com.bite.friend.elasticsearch.QuestionRepository;
+import com.bite.friend.manger.QuestionCacheManager;
 import com.bite.friend.mapper.question.QuestionMapper;
 import com.bite.friend.service.question.IQuestionService;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,9 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
 
 
     /*
@@ -98,6 +102,32 @@ public class QuestionServiceImpl implements IQuestionService {
         refreshQuestion(); //将数据库中的数据同步到ES中
         BeanUtils.copyProperties(question,questionDetailVO);
         return questionDetailVO;
+    }
+
+    /*
+    获取上一题
+     */
+    @Override
+    public String preQuestion(Long questionId) {
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize == 0){ // Redis中没有数据
+            questionCacheManager.refreshCache(); // 同步数据
+        }
+        //到这里才去redis中获取上一题的 id
+        return questionCacheManager.preQuestion(questionId).toString();
+    }
+
+    /*
+    获取下一题
+     */
+    @Override
+    public String nextQuestion(Long questionId) {
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize == 0){ // Redis中没有数据
+            questionCacheManager.refreshCache(); // 同步数据
+        }
+        //到这里才去redis中获取上一题的 id
+        return questionCacheManager.nextQuestion(questionId).toString();
     }
 
     /*

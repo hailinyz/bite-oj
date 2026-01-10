@@ -9,4 +9,8 @@ public interface IQuestionService {
     TableDataInfo list(QuestionQueryDTO questionQueeryDTO);
 
     QuestionDetailVO detail(Long questionId);
+
+    String preQuestion(Long questionId);
+
+    String nextQuestion(Long questionId);
 }

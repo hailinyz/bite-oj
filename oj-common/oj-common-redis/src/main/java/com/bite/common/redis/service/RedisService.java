@@ -192,6 +192,9 @@ public class RedisService {
     }
 
 
+    /*
+    获取list中指定索引数据,就是获取题目位置
+     */
     public <T> Long indexOfForList(final String key, T value) {
         return redisTemplate.opsForList().indexOf(key, value);
     }

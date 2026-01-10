@@ -48,7 +48,9 @@ public enum ResultCode {
     FAILED_USER_NOT_LOGIN (3302, "请先登录"),
     FAILED_USER_NOT_EXIST (3303, "用户不存在"),
     FAILED_FILE_UPLOAD (3304, "文件上传失败"),
-    FAILED_FILE_UPLOAD_TIME_LIMIT (3305, "当天文件上传次数超过上限");
+    FAILED_FILE_UPLOAD_TIME_LIMIT (3305, "当天文件上传次数超过上限"),
+    FAILED_FIRST_QUESTION (3306, "当前题目已经是第一题了哟~"),
+    FAILED_LAST_QUESTION (3307, "我已经到底了哟~~");
 
 
 

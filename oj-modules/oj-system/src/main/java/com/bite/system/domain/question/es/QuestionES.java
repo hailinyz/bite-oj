@@ -26,10 +26,10 @@ public class QuestionES {
     private Integer difficulty;
 
     @Field(type = FieldType.Long)
-    private Long timelimit;
+    private Long timeLimit;
 
     @Field(type = FieldType.Long)
-    private Long spacelimit;
+    private Long spaceLimit;
 
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
     private String content;

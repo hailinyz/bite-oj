@@ -14,6 +14,7 @@ import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.domain.question.vo.QuestionDetailVO;
 import com.bite.system.domain.question.vo.QuestionVO;
 import com.bite.system.elasticsearch.QuestionRepository;
+import com.bite.system.manger.QuestionCacheManager;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.question.IQuestionService;
 import com.github.pagehelper.PageHelper;
@@ -35,6 +36,9 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Autowired
     QuestionRepository questionRepository;
+
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
 
     /*
     获取题目列表接口
@@ -77,6 +81,7 @@ public class QuestionServiceImpl implements IQuestionService {
         QuestionES questionES = new QuestionES();
         BeanUtils.copyProperties(question, questionES);
         questionRepository.save(questionES);
+        questionCacheManager.addCache(question.getQuestionId());
         return true;
     }
 
@@ -116,11 +121,17 @@ public class QuestionServiceImpl implements IQuestionService {
         oldquestion.setDefaultCode(questionEditDTO.getDefaultCode());
         oldquestion.setMainFunc(questionEditDTO.getMainFunc());
 
-        QuestionES questionES = new QuestionES();
-        BeanUtils.copyProperties(oldquestion, questionES);
-        questionRepository.save(questionES);
+        // 先更新数据库
+        int result = questionMapper.updateById(oldquestion);
+        
+        // 数据库更新成功后，同步到ES
+        if (result > 0) {
+            QuestionES questionES = new QuestionES();
+            BeanUtils.copyProperties(oldquestion, questionES);
+            questionRepository.save(questionES);
+        }
 
-        return questionMapper.updateById(oldquestion);
+        return result;
 
     }
 
@@ -134,6 +145,7 @@ public class QuestionServiceImpl implements IQuestionService {
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
         questionRepository.deleteById(questionId);
+        questionCacheManager.deleteCache(questionId);
         return questionMapper.deleteById(questionId);
     }
 
