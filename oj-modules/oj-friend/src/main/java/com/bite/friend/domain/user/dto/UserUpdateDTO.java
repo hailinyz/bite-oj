@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class UserUpdateDTO {
 
+    private String headImage;
+
     private String nickName;
 
     private Integer sex;

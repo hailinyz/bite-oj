@@ -67,4 +67,13 @@ public class UserController extends BaseController {
         return toR(userService.edit(userUpdateDTO));
     }
 
+    /*
+     * 存储文件唯一标识(更新)
+     */
+    @PutMapping("/head-image/update")
+    public R<Void> updateHeadImage(@RequestBody UserUpdateDTO userUpdateDTO){
+        return toR(userService.updateHeadImage(userUpdateDTO.getHeadImage()));
+    }
+
+
 }

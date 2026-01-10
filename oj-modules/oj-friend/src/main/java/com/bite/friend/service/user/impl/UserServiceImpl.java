@@ -64,6 +64,9 @@ public class UserServiceImpl implements IUserService {
     @Value("${sms.is-send:false}")
     private boolean isSend; //开关打开：true 关闭：false
 
+    @Value("${file.oss.downloadUrl}")
+    private String downloadUrl;
+
     /*
     获取验证码
      */
@@ -185,7 +188,11 @@ public class UserServiceImpl implements IUserService {
         }
         LoginUserVO loginUserVO = new LoginUserVO();
         loginUserVO.setNickName(loginUser.getNickName());
-        loginUserVO.setHeadImage(loginUser.getHeadImage());
+        if (StrUtil.isNotEmpty(loginUser.getHeadImage())){
+            //        loginUserVO.setHeadImage("https://l-study-test01.oss-cn-beijing.aliyuncs.com/ojtest/" + loginUser.getHeadImage());
+            loginUserVO.setHeadImage(downloadUrl + loginUser.getHeadImage());
+        }
+
         return R.ok(loginUserVO);
     }
 
@@ -205,6 +212,10 @@ public class UserServiceImpl implements IUserService {
         UserVO userVO = userCacheManager.getUserById(userId);
         if (userVO == null){
             throw new ServiceException(ResultCode.FAILED_USER_NOT_EXIST);
+        }
+        if (StrUtil.isNotEmpty(userVO.getHeadImage())){
+            //        loginUserVO.setHeadImage("https://l-study-test01.oss-cn-beijing.aliyuncs.com/ojtest/" + loginUser.getHeadImage());
+            userVO.setHeadImage(downloadUrl + userVO.getHeadImage());
         }
 
         return userVO;
@@ -236,6 +247,30 @@ public class UserServiceImpl implements IUserService {
         tokenService.refreshLoginUser(user.getNickName(), user.getHeadImage(), //刷新当前用户的登录信息
                 ThreadLocalUtil.get(Constants.USER_KEY, String.class));
         return userMapper.updateById(user);
+    }
+
+    /*
+    存储文件唯一标识(修改用户头像)
+     */
+    @Override
+    public int updateHeadImage(String headImage) {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        if (userId == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+
+        user.setHeadImage(headImage);
+
+        ////更新用户缓存
+        userCacheManager.refreshUser(user); //用户详情的缓存
+        tokenService.refreshLoginUser(user.getNickName(), user.getHeadImage(), //刷新当前用户的登录信息
+                ThreadLocalUtil.get(Constants.USER_KEY, String.class));
+        return userMapper.updateById(user);
+
     }
 
 
