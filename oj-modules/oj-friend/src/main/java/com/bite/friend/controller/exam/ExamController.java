@@ -1,7 +1,7 @@
 package com.bite.friend.controller.exam;
 
-
 import com.bite.common.core.controller.BaseController;
+import com.bite.common.core.domain.R;
 import com.bite.common.core.domain.TableDataInfo;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.service.exam.IExamService;
@@ -33,6 +33,19 @@ public class ExamController extends BaseController {
     @GetMapping("/semiLogin/redis/list")
     public TableDataInfo redisList(ExamQueryDTO examQueryDTO){
         return examService.redisList(examQueryDTO);
+    }
+
+    /*
+     *获取竞赛中第一道题目的id接口**
+     */
+    @GetMapping("getFirstQuestion")
+    public R<String> getFirstQuestion(Long examId){
+
+        //代码逻辑：获取竞赛中题目的顺序列表， 先从redis  redis没有再从数据库 key：e:q:l:examId  value：questionId
+        // 排在第一个的题目 返回给前端
+
+        return R.ok(examService.getFirstQuestion(examId));
+
     }
 
 }

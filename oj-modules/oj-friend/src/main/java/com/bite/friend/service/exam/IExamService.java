@@ -13,4 +13,6 @@ public interface IExamService {
     List<ExamVO> list(ExamQueryDTO examQueryDTO);
 
     TableDataInfo redisList(ExamQueryDTO examQueryDTO);
+
+    String getFirstQuestion(Long examId);
 }

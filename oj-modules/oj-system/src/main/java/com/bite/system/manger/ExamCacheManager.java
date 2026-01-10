@@ -22,6 +22,8 @@ public class ExamCacheManager {
     public void deleteCache(Long examId) {
         redisService.removeForList(getExamListKey(), examId); // 删除未完成列表
         redisService.deleteObject(getDetailKey(examId)); // 删除缓存中
+        redisService.deleteObject(getExamQuestionListKey(examId));
+
     }
 
 
@@ -34,6 +36,11 @@ public class ExamCacheManager {
         return CacheConstants.EXAM_DETAIL + examId;
     }
 
-
+    /*
+     * 获取竞赛题目列表缓存的key
+     */
+    private String getExamQuestionListKey(Long examId) {
+        return CacheConstants.EXAM_QUESTION_LIST + examId;
+    }
 
 }

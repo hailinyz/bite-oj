@@ -70,6 +70,21 @@ public class ExamServiceImpl implements IExamService {
     }
 
     /*
+     * 获取竞赛的第一道题
+     */
+    @Override
+    public String getFirstQuestion(Long examId) {
+
+        //先判断缓存中有没有数据
+        Long listSize = examCacheManager.getExamQuestionListSize(examId);
+        if (listSize == null || listSize <= 0){
+            examCacheManager.refreshExamQuestionCache(examId); //现在刷新的是竞赛中题目列表数据
+        }
+
+        return examCacheManager.getFirstQuestion(examId).toString();
+    }
+
+    /*
      * 判断当前用户是否参加竞赛
      */
     private void assembleExamVOList(List<ExamVO> examVOList) {
