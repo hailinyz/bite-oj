@@ -10,6 +10,7 @@ import com.bite.common.core.domain.TableDataInfo;
 import com.bite.friend.domain.question.Question;
 import com.bite.friend.domain.question.dto.QuestionQueryDTO;
 import com.bite.friend.domain.question.es.QuestionES;
+import com.bite.friend.domain.question.vo.QuestionDetailVO;
 import com.bite.friend.domain.question.vo.QuestionVO;
 import com.bite.friend.elasticsearch.QuestionRepository;
 import com.bite.friend.mapper.question.QuestionMapper;
@@ -73,6 +74,30 @@ public class QuestionServiceImpl implements IQuestionService {
         List<QuestionVO> questionVOList = BeanUtil.copyToList(questionESList, QuestionVO.class);
         return TableDataInfo.success(questionVOList, total);
 
+    }
+
+    /*
+    获取题目详情
+     */
+    @Override
+    public QuestionDetailVO detail(Long questionId) {
+
+        // 从ES中查询
+        QuestionES questionES = questionRespository.findById(questionId).orElse(null); //获取的是options字段,所以需要.orElse(null)
+        QuestionDetailVO questionDetailVO = new QuestionDetailVO();
+        if (questionES != null){
+            BeanUtils.copyProperties(questionES,questionDetailVO);
+            return questionDetailVO;
+        }
+
+        // 从数据库中查询
+        Question question = questionMapper.selectById(questionId);
+        if (question == null){
+            return null;
+        }
+        refreshQuestion(); //将数据库中的数据同步到ES中
+        BeanUtils.copyProperties(question,questionDetailVO);
+        return questionDetailVO;
     }
 
     /*
