@@ -136,7 +136,7 @@ public class ExamCacheManager {
         redisService.rightPushAll(getExamQuestionListKey(examId), examQuestionIdList);
 
         //节省redis缓存资源 1天
-        Long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(),
+        long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(),
                LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0));
         redisService.expire(getExamQuestionListKey(examId), seconds, TimeUnit.SECONDS);
     }
