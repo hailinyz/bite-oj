@@ -85,6 +85,36 @@ public class ExamServiceImpl implements IExamService {
     }
 
     /*
+     * 获取上一题（竞赛内）
+     */
+    @Override
+    public String preQuestion(Long examId, Long questionId) {
+        checkAndRefresh(examId);
+        //到这里才去redis中获取上一题的 id
+        return examCacheManager.preQuestion(examId, questionId).toString();
+    }
+
+
+    /*
+     * 获取下一题(竞赛内)
+     */
+    @Override
+    public String nextQuestion(Long examId, Long questionId) {
+        checkAndRefresh(examId);
+        //到这里才去redis中获取上一题的 id
+        return examCacheManager.nextQuestion(examId, questionId).toString();
+    }
+
+
+    private void checkAndRefresh(Long examId) { //检测缓存数据
+        Long listSize = examCacheManager.getExamQuestionListSize(examId);
+        if (listSize == null || listSize == 0){ // Redis中没有数据
+            examCacheManager.refreshExamQuestionCache(examId); // 同步数据
+        }
+    }
+
+
+    /*
      * 判断当前用户是否参加竞赛
      */
     private void assembleExamVOList(List<ExamVO> examVOList) {

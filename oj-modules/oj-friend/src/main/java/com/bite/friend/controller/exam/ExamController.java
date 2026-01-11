@@ -48,4 +48,23 @@ public class ExamController extends BaseController {
 
     }
 
+    /*
+    获取上一题（竞赛内）
+     */
+    @GetMapping("preQuestion")
+    public R<String> preQuestion(Long examId, Long questionId){
+        return R.ok(examService.preQuestion(examId, questionId));
+    }
+
+    /*
+    获取下一题（竞赛内）
+     */
+    @GetMapping("nextQuestion")
+    public R<String> nextQuestion(Long examId, Long questionId){
+        return R.ok(examService.nextQuestion(examId, questionId));
+    }
+
+
+
+
 }

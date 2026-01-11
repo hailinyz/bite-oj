@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bite.common.core.constants.CacheConstants;
 import com.bite.common.core.constants.Constants;
 import com.bite.common.core.enums.ExamListType;
+import com.bite.common.core.enums.ResultCode;
 import com.bite.common.redis.service.RedisService;
+import com.bite.common.security.exception.ServiceException;
 import com.bite.friend.domain.exam.Exam;
 import com.bite.friend.domain.exam.ExamQuestion;
 import com.bite.friend.domain.exam.dto.ExamQueryDTO;
@@ -75,6 +77,30 @@ public class ExamCacheManager {
      */
     public Long getFirstQuestion(Long examId) {
         return redisService.indexForList(getExamQuestionListKey(examId), 0, Long.class);
+    }
+
+    /*
+     * 获取上一个题目(竞赛内)
+     */
+    public Long preQuestion(Long examId, Long questionId) {
+        Long index = redisService.indexOfForList(getExamQuestionListKey(examId), questionId);
+        long lastIndex = getExamQuestionListSize(examId) - 1;
+        if (index == 0) { // 已经到第一个了
+            throw new ServiceException(ResultCode.FAILED_FIRST_QUESTION);
+        }
+        return redisService.indexForList(getExamQuestionListKey(examId), index - 1, Long.class); // 获取上一题
+    }
+
+    /*
+     * 获取下一个题目(竞赛内)
+     */
+    public Long nextQuestion(Long examId, Long questionId) {
+        Long index = redisService.indexOfForList(getExamQuestionListKey(examId), questionId);
+        long lastIndex = getExamQuestionListSize(examId) - 1;
+        if (index == lastIndex) {
+            throw new ServiceException(ResultCode.FAILED_LAST_QUESTION);
+        }
+        return redisService.indexForList(getExamQuestionListKey(examId), index + 1, Long.class); // 获取下一题
     }
 
 
@@ -182,6 +208,8 @@ public class ExamCacheManager {
     }
 
 
+
+
     private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO, Long  userId) {
         PageHelper.startPage(examQueryDTO.getPageNum(), examQueryDTO.getPageSize());
         if (ExamListType.USER_EXAM_LIST.getValue().equals( examQueryDTO.getType())){
@@ -241,9 +269,6 @@ public class ExamCacheManager {
     private String getExamQuestionListKey(Long examId) {
         return CacheConstants.EXAM_QUESTION_LIST + examId;
     }
-
-
-
 
 
 
