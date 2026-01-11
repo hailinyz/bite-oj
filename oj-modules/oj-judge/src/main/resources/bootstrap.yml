@@ -1,7 +1,15 @@
-server:
-  port: 9204
-# Spring
 spring:
   application:
-    # 应⽤名称
+    # 应用名称
     name: oj-judge
+  profiles:
+    active: local # 使用 local 环境
+  cloud:
+    nacos:
+      discovery: # nacos注册中心
+        namespace: bebc7274-6a9a-4c8b-84e8-461d7d385346
+        server-addr: http://localhost:8848
+      config: # nacos配置中心
+        namespace: bebc7274-6a9a-4c8b-84e8-461d7d385346
+        server-addr: http://localhost:8848
+        file-extension: yaml

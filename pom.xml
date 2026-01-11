@@ -18,6 +18,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <module>oj-modules</module>
         <module>oj-common</module>
         <module>oj-gateway</module>
+        <module>oj-api</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
