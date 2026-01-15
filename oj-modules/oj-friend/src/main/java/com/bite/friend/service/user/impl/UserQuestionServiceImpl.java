@@ -16,7 +16,7 @@ import com.bite.friend.domain.user.dto.UserSubmitDTO;
 import com.bite.friend.mapper.question.QuestionMapper;
 import com.bite.friend.service.user.IUserQuestionService;
 import com.bite.system.domain.question.es.QuestionES;
-import com.bite.system.elasticsearch.QuestionRepository;
+import com.bite.system.elasticsearch.SystemQuestionRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.List;
 public class UserQuestionServiceImpl implements IUserQuestionService {
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private SystemQuestionRepository questionRepository;
 
     @Autowired
     private QuestionMapper questionMapper;
@@ -75,7 +75,7 @@ public class UserQuestionServiceImpl implements IUserQuestionService {
         judgeSubmitDTO.setExamId(userSubmitDTO.getExamId());
         judgeSubmitDTO.setProgramType(userSubmitDTO.getProgramType());
         //拼接完整代码
-        judgeSubmitDTO.setUserCode(codeConnect(userSubmitDTO.getUserCode(), questionES.getMainFuc()));
+        judgeSubmitDTO.setUserCode(codeConnect(userSubmitDTO.getUserCode(), questionES.getMainFunc()));
         //解析测试用例
         List<QuestionCase> questionCaseList = JSONUtil.toList(questionES.getQuestionCase(), QuestionCase.class);// 将json字符串转换成List
         //用流的方式分成两个集合

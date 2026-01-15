@@ -34,7 +34,7 @@ public class JudgeServiceImpl implements IJudgeService {
     @Override
     public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
         SandBoxExecuteResult sandBoxExecuteResult =
-                sandboxService.exeJavaCode(judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList()); //拿到在docker的执行结果
+                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList()); //拿到在docker的执行结果
         UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
 
         if (sandBoxExecuteResult != null && sandBoxExecuteResult.getRunStatus().equals(CodeRunStatus.SUCCEED)){
@@ -58,9 +58,9 @@ public class JudgeServiceImpl implements IJudgeService {
                                 SandBoxExecuteResult sandBoxExecuteResult,
                                 UserQuestionResultVO userQuestionResultVO) {
         //比对执行结果  时间限制、空间限制的比对
-        List<String> exeOutoutList = sandBoxExecuteResult.getOutputList();
+        List<String> exeOutputList = sandBoxExecuteResult.getOutputList();
         List<String> outputList = judgeSubmitDTO.getOutputList();
-        if (outputList.size() != exeOutoutList.size()){  //长度不一致(数量上是否相等的判断)
+        if (outputList.size() != exeOutputList.size()){  //长度不一致(数量上是否相等的判断)
             userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setPass(Constants.FALSE);
             userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg());
@@ -68,7 +68,7 @@ public class JudgeServiceImpl implements IJudgeService {
         }  //长度一致，然后对输出结果进行逐个比对
             List<UserExeResult> userExeResultList = new ArrayList<>();
         //结果比对
-        boolean passed = resultCompare(judgeSubmitDTO, outputList, exeOutoutList);
+        boolean passed = resultCompare(judgeSubmitDTO, exeOutputList, outputList, userExeResultList);
 
         //组装结果（判断时间、空间限制）
         return assembleUserQuestionResultVO(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO, userExeResultList, passed);
@@ -84,21 +84,21 @@ public class JudgeServiceImpl implements IJudgeService {
                                                                      boolean passed) {
         userQuestionResultVO.setUserExeResultList(userExeResultList);
         if (!passed){
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg());
             return userQuestionResultVO;
         }
         //输出结果一致，比对时间限制&空间限制
         if (sandBoxExecuteResult.getUseMemory() > judgeSubmitDTO.getSpaceLimit()){
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_MEMORY.getMsg());
             return userQuestionResultVO;
         }
         if (sandBoxExecuteResult.getUseTime() > judgeSubmitDTO.getTimeLimit()){
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
             userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_TIME.getMsg());
             return userQuestionResultVO;
         }
@@ -112,17 +112,19 @@ public class JudgeServiceImpl implements IJudgeService {
     /*
     结果比对
      */
-    private static boolean resultCompare(JudgeSubmitDTO judgeSubmitDTO, List<String> outputList, List<String> exeOutoutList) {
+    private static boolean resultCompare(JudgeSubmitDTO judgeSubmitDTO, List<String> exeOutputList,
+                                         List<String> outputList, List<UserExeResult> userExeResultList) {
         boolean passed = true;
         for (int index = 0; index < outputList.size(); index++) {
             String output = outputList.get(index);
-            String exeOutput = exeOutoutList.get(index);
+            String exeOutPut = exeOutputList.get(index);
             String input = judgeSubmitDTO.getInputList().get(index);
             UserExeResult userExeResult = new UserExeResult();
             userExeResult.setInput(input);
             userExeResult.setOutput(output);
-            userExeResult.setExeOutput(exeOutput);
-            if (!output.equals(exeOutput)){
+            userExeResult.setExeOutput(exeOutPut);
+            userExeResultList.add(userExeResult);
+            if (!output.equals(exeOutPut)){
                 passed = false;
             }
         }
@@ -138,6 +140,8 @@ public class JudgeServiceImpl implements IJudgeService {
         userSubmit.setExamId(judgeSubmitDTO.getExamId());
         userSubmit.setProgramType(judgeSubmitDTO.getProgramType());
         userSubmit.setUserCode(judgeSubmitDTO.getUserCode());
+        userSubmit.setCreateBy(judgeSubmitDTO.getUserId());
+//        userSubmit.setPass(Constants.FALSE);
 //        userSubmitMapper.insert(userSubmit); //我们现在以最后一次提交为准，但是这个是每次提交都保存,所以我们先删除再插入
         userSubmitMapper.delete(new LambdaQueryWrapper<UserSubmit>()
                 .eq(UserSubmit::getUserId, judgeSubmitDTO.getUserId())
@@ -147,6 +151,12 @@ public class JudgeServiceImpl implements IJudgeService {
         userSubmitMapper.insert(userSubmit); //先删除再插入
         return userQuestionResultVO;
     }
+
+
+
+
+
+
 
 
 }

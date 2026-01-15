@@ -16,7 +16,7 @@ import com.bite.friend.domain.exam.dto.ExamQueryDTO;
 import com.bite.friend.domain.exam.vo.ExamVO;
 import com.bite.friend.domain.user.UserExam;
 import com.bite.friend.mapper.exam.ExamMapper;
-import com.bite.friend.mapper.exam.examQuestionMapper;
+import com.bite.friend.mapper.exam.ExamQuestionMapper;
 import com.bite.friend.mapper.user.UserExamMapper;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ public class ExamCacheManager {
     private UserExamMapper userExamMapper;
 
     @Autowired
-    private examQuestionMapper examQuestionMapper;
+    private ExamQuestionMapper examQuestionMapper;
 
     /*
     将用户竞赛信息存储到 redis中

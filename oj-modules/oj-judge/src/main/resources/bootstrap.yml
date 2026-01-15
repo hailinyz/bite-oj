@@ -7,9 +7,9 @@ spring:
   cloud:
     nacos:
       discovery: # nacos注册中心
-        namespace: bebc7274-6a9a-4c8b-84e8-461d7d385346
+        namespace: 31b2f847-7537-4229-8098-46fd23608020
         server-addr: http://localhost:8848
       config: # nacos配置中心
-        namespace: bebc7274-6a9a-4c8b-84e8-461d7d385346
+        namespace: 31b2f847-7537-4229-8098-46fd23608020
         server-addr: http://localhost:8848
         file-extension: yaml

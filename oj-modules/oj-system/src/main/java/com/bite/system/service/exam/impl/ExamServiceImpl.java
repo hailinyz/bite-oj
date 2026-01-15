@@ -18,8 +18,8 @@ import com.bite.system.domain.exam.vo.ExamVO;
 import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.vo.QuestionVO;
 import com.bite.system.manger.ExamCacheManager;
-import com.bite.system.mapper.exam.examMapper;
-import com.bite.system.mapper.exam.examQuestionMapper;
+import com.bite.system.mapper.exam.ExamMapper;
+import com.bite.system.mapper.exam.ExamQuestionMapper;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.exam.ExamService;
 import com.github.pagehelper.PageHelper;
@@ -32,16 +32,16 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class ExamServiceImpl extends ServiceImpl<examQuestionMapper, ExamQuestion> implements ExamService {
+public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestion> implements ExamService {
 
     @Autowired
-    private examMapper examMapper;
+    private ExamMapper examMapper;
 
     @Autowired
     private QuestionMapper questionMapper;
 
     @Autowired
-    private examQuestionMapper examQuestionMapper;
+    private ExamQuestionMapper examQuestionMapper;
 
     @Autowired
     private ExamCacheManager examCacheManager;

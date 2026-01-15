@@ -1,6 +1,5 @@
 package com.bite.common.core.constants;
 
-
 public class JudgeConstants {
 
     public static final String ERROR_ANSWER = "未完全通过所有用例";
@@ -22,7 +21,7 @@ public class JudgeConstants {
 
     public static final String USER_CODE_JAVA_FILE_NAME = "Solution";
 
-    public static final String JAVA_ENV_IMAGE = "openjdk:8-jdk-alpine";
+    public static final String JAVA_ENV_IMAGE = "amazoncorretto:8";
 
     public static final String JAVA_CONTAINER_PREFIX = "/";
 
@@ -34,5 +33,3 @@ public class JudgeConstants {
     //  java -cp  /usr/share/java  Solution 1 2
 
 }
-
-

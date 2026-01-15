@@ -9,6 +9,6 @@ import com.bite.system.domain.exam.ExamQuestion;
 
 import java.util.List;
 
-public interface examQuestionMapper extends BaseMapper<ExamQuestion> {
+public interface ExamQuestionMapper extends BaseMapper<ExamQuestion> {
 
 }

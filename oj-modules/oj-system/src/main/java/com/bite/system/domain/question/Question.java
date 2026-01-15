@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class Question extends BaseEntity {
 
-    @TableId(type = IdType.ASSIGN_ID) // 主键 雪花算法
+    @TableId(type = IdType.ASSIGN_ID)
     private Long questionId;
 
     private String title;

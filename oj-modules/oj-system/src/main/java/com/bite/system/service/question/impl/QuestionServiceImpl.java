@@ -13,7 +13,7 @@ import com.bite.system.domain.question.dto.QuestionQueryDTO;
 import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.domain.question.vo.QuestionDetailVO;
 import com.bite.system.domain.question.vo.QuestionVO;
-import com.bite.system.elasticsearch.QuestionRepository;
+import com.bite.system.elasticsearch.SystemQuestionRepository;
 import com.bite.system.manger.QuestionCacheManager;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.question.IQuestionService;
@@ -35,7 +35,7 @@ public class QuestionServiceImpl implements IQuestionService {
     private QuestionMapper questionMapper;
 
     @Autowired
-    QuestionRepository questionRepository;
+    SystemQuestionRepository questionRepository;
 
     @Autowired
     private QuestionCacheManager questionCacheManager;

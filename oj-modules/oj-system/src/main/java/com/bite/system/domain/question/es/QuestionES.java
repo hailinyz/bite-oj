@@ -38,12 +38,11 @@ public class QuestionES {
     private String questionCase;
 
     @Field(type = FieldType.Text)
-    private String mainFuc;
+    private String mainFunc;
 
     @Field(type = FieldType.Text)
     private String defaultCode;
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime createTime;
-
 }
