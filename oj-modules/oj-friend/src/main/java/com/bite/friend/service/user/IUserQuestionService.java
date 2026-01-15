@@ -6,4 +6,6 @@ import com.bite.friend.domain.user.dto.UserSubmitDTO;
 
 public interface IUserQuestionService {
     R<UserQuestionResultVO> submit(UserSubmitDTO userSubmitDTO);
+
+   boolean rabbitSubmit(UserSubmitDTO submitDTO);
 }

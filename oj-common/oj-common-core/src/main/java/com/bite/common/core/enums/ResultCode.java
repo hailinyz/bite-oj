@@ -51,7 +51,8 @@ public enum ResultCode {
     FAILED_FILE_UPLOAD_TIME_LIMIT (3305, "当天文件上传次数超过上限"),
     FAILED_FIRST_QUESTION (3306, "当前题目已经是第一题了哟~"),
     FAILED_LAST_QUESTION (3307, "我已经到底了哟~~"),
-    FAILED_NOT_SUPPORT_PROGRAM (3308, "当前不支持该语言");
+    FAILED_NOT_SUPPORT_PROGRAM (3308, "当前不支持该语言"),
+    FAILED_RABBIT_PRODUCE (3701, "mq生产消息异常");
 
 
 

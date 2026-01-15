@@ -14,6 +14,7 @@ import com.bite.friend.domain.question.Question;
 import com.bite.friend.domain.question.QuestionCase;
 import com.bite.friend.domain.user.dto.UserSubmitDTO;
 import com.bite.friend.mapper.question.QuestionMapper;
+import com.bite.friend.rabbit.JudgeProducer;
 import com.bite.friend.service.user.IUserQuestionService;
 import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.elasticsearch.SystemQuestionRepository;
@@ -35,18 +36,39 @@ public class UserQuestionServiceImpl implements IUserQuestionService {
     @Autowired
     private RemoteJudgeService remoteJudgeService;
 
+    @Autowired
+    private JudgeProducer judgeProducer;
+
     /*
     接收用户代码提交 --> 判题 --> 返回结果
      */
     @Override
-    public R<UserQuestionResultVO> submit(UserSubmitDTO userSubmitDTO) {
-        Integer programType = userSubmitDTO.getProgramType();
+    public R<UserQuestionResultVO> submit(UserSubmitDTO submitDTO) {
+        Integer programType = submitDTO.getProgramType();
         //判断程序语言类型
         if (ProgramType.JAVA.getValue().equals(programType)){
             //按照java语言逻辑处理
-            JudgeSubmitDTO judgeSubmitDTO = assembleJudgeSubmitDTO(userSubmitDTO);
+            JudgeSubmitDTO judgeSubmitDTO = assembleJudgeSubmitDTO(submitDTO);
             //调用判题服务 -- 通过openFeign调用
             return remoteJudgeService.doJudgeJavaCode(judgeSubmitDTO);
+        }
+        throw new ServiceException(ResultCode.FAILED_NOT_SUPPORT_PROGRAM);
+    }
+
+    /*
+    提交代码到rabbitMQ中
+     */
+    @Override
+    public boolean rabbitSubmit(UserSubmitDTO submitDTO) {
+        Integer programType = submitDTO.getProgramType();
+        //判断程序语言类型
+        if (ProgramType.JAVA.getValue().equals(programType)){
+            //按照java语言逻辑处理
+            JudgeSubmitDTO judgeSubmitDTO = assembleJudgeSubmitDTO(submitDTO); //将这个DTO以消息发送的方式传给rabbitmq就行了
+/*            //调用判题服务 -- 通过openFeign调用
+            return remoteJudgeService.doJudgeJavaCode(judgeSubmitDTO);*/
+            judgeProducer.produceMsg(judgeSubmitDTO); //将这个DTO以消息发送的方式传给rabbitmq就行了
+            return true;
         }
         throw new ServiceException(ResultCode.FAILED_NOT_SUPPORT_PROGRAM);
     }

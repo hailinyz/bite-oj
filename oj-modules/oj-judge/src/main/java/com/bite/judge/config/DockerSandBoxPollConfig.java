@@ -42,11 +42,10 @@ public class DockerSandBoxPollConfig {
                 .withDockerHost(dockerHost)
                 .build();
 
-        DockerClient dockerClient = DockerClientBuilder //都是要拿client操作第三方
+        return DockerClientBuilder //都是要拿client操作第三方
                 .getInstance(clientConfig)
                 .withDockerCmdExecFactory(new NettyDockerCmdExecFactory())
                 .build();
-        return dockerClient;
     }
 
     @Bean

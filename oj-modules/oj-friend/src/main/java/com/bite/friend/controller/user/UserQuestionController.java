@@ -26,6 +26,13 @@ public class UserQuestionController extends BaseController {
         return userQuestionService.submit(userSubmitDTO);
     }
 
+    /*
+    接收用户代码提交 --> 判题 --> 队列返回结果(新街口)
+     */
+    @PostMapping("/rabbit/submit")
+    public R<Void> rabbitSubmit(@RequestBody UserSubmitDTO submitDTO) {
+        return toR(userQuestionService.rabbitSubmit(submitDTO));
+    }
 
 
 }

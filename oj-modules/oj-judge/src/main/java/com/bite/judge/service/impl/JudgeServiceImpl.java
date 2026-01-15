@@ -54,7 +54,8 @@ public class JudgeServiceImpl implements IJudgeService {
             userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE); //0分
         }
 
-        return saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        return userQuestionResultVO;
     }
 
     private static UserQuestionResultVO doJudge(JudgeSubmitDTO judgeSubmitDTO,
