@@ -23,7 +23,10 @@ import java.util.List;
 public class JudgeServiceImpl implements IJudgeService {
 
     @Autowired
-    private ISandboxService sandboxService;
+    private ISandboxService sandboxService; //运行代码的接口（旧）
+
+    @Autowired
+    private SandboxPoolServiceImpl sandboxService2; //运行代码的接口（新）
 
     @Autowired
     private UserSubmitMapper userSubmitMapper;
@@ -34,7 +37,7 @@ public class JudgeServiceImpl implements IJudgeService {
     @Override
     public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
         SandBoxExecuteResult sandBoxExecuteResult =
-                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList()); //拿到在docker的执行结果
+                sandboxService2.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList()); //拿到在docker的执行结果
         UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
 
         if (sandBoxExecuteResult != null && sandBoxExecuteResult.getRunStatus().equals(CodeRunStatus.SUCCEED)){
